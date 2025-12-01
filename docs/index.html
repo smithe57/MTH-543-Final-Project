@@ -1,0 +1,3946 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta name="author" content="Eric Smith" />
+
+
+
+<title>Energy Performance Estimation</title>
+
+<meta property="og:title" content="Energy Performance Estimation" />
+
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
+
+<link rel="icon" href="data:image/x-icon;" type="image/x-icon">
+
+
+<script type="text/javascript">
+window.FlexDashboardComponents = [];
+</script>
+
+<script id="flexdashboard-navbar" type="application/json">
+[{"title":"Source Code","icon":"fa-code","href":"source_embed","align":"right"}]
+</script>
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<link href="site_libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-4.6.0/bootstrap.bundle.min.js"></script>
+<script src="site_libs/bs3compat-0.9.0/transition.js"></script>
+<script src="site_libs/bs3compat-0.9.0/tabs.js"></script>
+<script src="site_libs/bs3compat-0.9.0/bs3compat.js"></script>
+<link href="site_libs/flexdashboard-css-0.6.2/flexdashboard-css.css" rel="stylesheet" />
+<script src="site_libs/stickytableheaders-0.1.19/jquery.stickytableheaders.min.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+<link href="site_libs/featherlight-1.3.5/featherlight.min.css" rel="stylesheet" />
+<script src="site_libs/featherlight-1.3.5/featherlight.min.js"></script>
+<link href="site_libs/prism-1.4.1/prism.css" rel="stylesheet" />
+<script src="site_libs/prism-1.4.1/prism.js"></script>
+<style type="text/css">
+/*
+  CSS for flexdashboard.js' use of Sly(). The sizing/position of this CSS needs to be
+  applied _before_ flexdashboard.js initializes, which is why this CSS has been pulled
+  out from flexdashboard.scss and inlined in the document's head.
+*/
+
+.storyboard-nav button {
+  background: transparent;
+  border: 0;
+  opacity: .3;
+  outline: none;
+  padding: 0;
+}
+
+.storyboard-nav button:hover,
+.storyboard-nav button:hover {
+  opacity: .5;
+}
+
+.storyboard-nav button:disabled,
+.storyboard-nav button:disabled {
+  opacity: .1;
+}
+
+.storyboard-nav .sbnext,
+.storyboard-nav .sbprev {
+  float: left;
+  width: 2%;
+  height: 120px;
+}
+
+.storyboard-nav .sbprev {
+  text-align: left;
+  width: 2%;
+}
+
+.storyboard-nav .sbnext {
+  float: right;
+  text-align: right;
+  margin-right: 8px;
+}
+
+.storyboard-nav .sbframelist {
+  margin: 0 auto;
+  width: 94%;
+  height: 120px;
+  overflow: hidden;
+  text-shadow: none;
+  margin-bottom: 8px;
+}
+
+.storyboard-nav .sbframelist ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.storyboard-nav .sbframelist ul li {
+  float: left;
+  width: 270px;
+  height: 100%;
+  padding: 10px 10px 10px 10px;
+  margin-right: 8px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.storyboard-nav .sbframelist ul li:last-child {
+  margin-right: 0px;
+}
+
+.sbframe-commentary {
+  width: 300px;
+}
+
+.sbframe-commentary ul {
+  padding-left: 22px;
+}
+
+.sbframe.active {
+  display: flex;
+}
+
+.sbframe:not(.active) {
+  display: none;
+}
+@media only screen and (min-width: 768px) {
+html, body {
+  height: 100%;
+}
+
+#dashboard-container {
+  height: 100%;
+}
+}
+</style>
+
+
+
+</head>
+
+<body>
+
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+<div class="container-fluid">
+<div class="navbar-header">
+
+<span class="navbar-logo pull-left">
+  
+</span>
+<span class="navbar-brand">
+  Energy Performance Estimation
+  <span class="navbar-author">
+    Eric Smith
+    </span>
+</span>
+
+<button id="navbar-button" type="button" class="navbar-toggle collapsed pull-right" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+
+</div>
+<div id="navbar" class="navbar-collapse collapse">
+<ul class="nav navbar-nav navbar-left">
+</ul>
+<ul class="nav navbar-nav navbar-right">
+</ul>
+</div><!--/.nav-collapse-->
+</div><!--/.container-->
+</div><!--/.navbar-->
+
+<img class="mobile-figure" data-mobile-figure-id=fig1 src="index_files/figure-html/intro-plot-1.mb.png" />
+<img class="mobile-figure" data-mobile-figure-id=fig2 src="index_files/figure-html/scatter-plots-1.mb.png" />
+<img class="mobile-figure" data-mobile-figure-id=fig3 src="index_files/figure-html/predictor-histograms-1.mb.png" />
+<img class="mobile-figure" data-mobile-figure-id=fig4 src="index_files/figure-html/response-histograms-1.mb.png" />
+<script type="text/javascript">
+
+
+var FlexDashboard = (function () {
+
+  // initialize options
+  var _options = {};
+
+  var FlexDashboard = function() {
+
+    // default options
+    _options = $.extend(_options, {
+      theme: "cosmo",
+      fillPage: false,
+      orientation: 'columns',
+      storyboard: false,
+      defaultFigWidth: 576,
+      defaultFigHeight: 461,
+      defaultFigWidthMobile: 360,
+      defaultFigHeightMobile: 461,
+      isMobile: false,
+      isPortrait: false,
+      resize_reload: true
+    });
+  };
+
+  function init(options) {
+
+    // extend default options
+    $.extend(true, _options, options);
+
+    // add ids to sections that don't have them (pandoc won't assign ids
+    // to e.g. sections with titles consisting of only chinese characters)
+    var nextId = 1;
+    $('.level1:not([id]),.level2:not([id]),.level3:not([id])').each(function() {
+      $(this).attr('id', 'dashboard-' + nextId++);
+    });
+
+    // find navbar items
+    var navbarItems = $('#flexdashboard-navbar');
+    if (navbarItems.length)
+      navbarItems = JSON.parse(navbarItems.html());
+    addNavbarItems(navbarItems);
+
+    // find the main dashboard container
+    var dashboardContainer = $('#dashboard-container');
+
+    // resolve mobile classes
+    resolveMobileClasses(dashboardContainer);
+
+    // one time global initialization for components
+    componentsInit(dashboardContainer);
+
+    // look for a global sidebar
+    var globalSidebar = dashboardContainer.find(".section.level1.sidebar");
+    if (globalSidebar.length > 0) {
+
+      // global layout for fullscreen displays
+      if (!isMobilePhone()) {
+
+         // hoist it up to the top level
+         globalSidebar.insertBefore(dashboardContainer);
+
+         // lay it out (set width/positions)
+         layoutSidebar(globalSidebar, dashboardContainer);
+
+      // tuck sidebar into first page for mobile phones
+      } else {
+
+        // convert it into a level3 section
+        globalSidebar.removeClass('sidebar');
+        globalSidebar.removeClass('level1');
+        globalSidebar.addClass('level3');
+        var h1 = globalSidebar.children('h1');
+        var h3 = $('<h3></h3>');
+        h3.append(h1.contents());
+        h3.insertBefore(h1);
+        h1.detach();
+
+        // move it into the first page
+        var page = dashboardContainer.find('.section.level1').first();
+        if (page.length > 0)
+          page.prepend(globalSidebar);
+      }
+    }
+
+    // look for pages to layout
+    var pages = $('div.section.level1');
+    if (pages.length > 0) {
+
+        // find the navbar and collapse on clicked
+        var navbar = $('#navbar');
+        navbar.on("click", "a[data-toggle!=dropdown]", null, function () {
+           navbar.collapse('hide');
+        });
+
+        // envelop the dashboard container in a tab content div
+        dashboardContainer.wrapInner('<div class="tab-content"></div>');
+
+        pages.each(function(index) {
+
+          // lay it out
+          layoutDashboardPage($(this));
+
+          // add it to the navbar
+          addToNavbar($(this), index === 0);
+
+        });
+
+    } else {
+
+      // remove the navbar and navbar button if we don't
+      // have any navbuttons
+      if (navbarItems.length === 0) {
+        $('#navbar').remove();
+        $('#navbar-button').remove();
+      }
+
+      // add the storyboard class if requested
+      if (_options.storyboard)
+        dashboardContainer.addClass('storyboard');
+
+      // layout the entire page
+      layoutDashboardPage(dashboardContainer);
+    }
+
+    // if we are in shiny we need to trigger a window resize event to
+    // force correct layout of shiny-bound-output elements
+    if (isShinyDoc())
+      $(window).trigger('resize');
+
+    // make main components visible
+    $('.section.sidebar').css('visibility', 'visible');
+    dashboardContainer.css('visibility', 'visible');
+
+    // handle location hash
+    handleLocationHash();
+
+    // intialize prism highlighting
+    initPrismHighlighting();
+
+    // record mobile and orientation state then register a handler
+    // to refresh if resize_reload is set to true and it changes
+    _options.isMobile = isMobilePhone();
+    _options.isPortrait = isPortrait();
+    if (_options.resize_reload) {
+      $(window).on('resize', function() {
+        if (_options.isMobile !== isMobilePhone() ||
+            _options.isPortrait !== isPortrait()) {
+          window.location.reload();
+        }
+      });
+    } else {
+      // if in desktop mode and resizing to mobile, make sure the heights are 100%
+      // This enforces what `fillpage.css` does for "wider" pages.
+      // Since we are not reloading once the page becomes small, we need to force the height to 100%
+      // This is a new situation introduced when `_options.resize_reload` is `false`
+      if (! _options.isMobile) {
+        // only add if `fillpage.css` was added in the first place
+        if (_options.fillPage) {
+          // fillpage.css
+          $("html,body,#dashboard").css("height", "100%");
+        }
+      }
+    }
+    // trigger layoutcomplete event
+    dashboardContainer.trigger('flexdashboard:layoutcomplete');
+  }
+
+  function resolveMobileClasses(dashboardContainer) {
+     // add top level layout class
+    dashboardContainer.addClass(isMobilePhone() ? 'mobile-layout' :
+                                                  'desktop-layout');
+
+    // look for .mobile sections and add .no-mobile to their peers
+    var mobileSections = $('.section.mobile');
+    mobileSections.each(function() {
+       var id = $(this).attr('id');
+       var nomobileId = id.replace(/-\d+$/, '');
+       $('#' + nomobileId).addClass('no-mobile');
+    });
+  }
+
+  function addNavbarItems(navbarItems) {
+
+    var navbarLeft = $('ul.navbar-left');
+    var navbarRight = $('ul.navbar-right');
+
+    for (var i = 0; i<navbarItems.length; i++) {
+
+      // get the item
+      var item = navbarItems[i];
+
+      // determine the container
+      var container = null;
+      if (item.align === "left")
+        container = navbarLeft;
+      else
+        container = navbarRight;
+
+      // navbar menu if we have multiple items
+      if (item.items) {
+        var menu = navbarMenu(null, item.icon, item.title, container);
+        for (var j = 0; j<item.items.length; j++) {
+          var subItem = item.items[j];
+          var li = $('<li></li>');
+          var a = navbarLink(subItem.icon, subItem.title, subItem.href, subItem.target);
+          a.removeClass("nav-link").addClass("dropdown-item");
+          li.append(a);
+          menu.append(li);
+        }
+      } else {
+        var li = $('<li class="nav-item"></li>');
+        li.append(navbarLink(item.icon, item.title, item.href, item.target));
+        container.append(li);
+      }
+    }
+  }
+
+  // create or get a reference to an existing dropdown menu
+  function navbarMenu(id, icon, title, container) {
+    var existingMenu = [];
+    if (id)
+      existingMenu = container.children('#' + id);
+    if (existingMenu.length > 0) {
+      return existingMenu.children('ul');
+    } else {
+      var li = $('<li class="nav-item"></li>');
+      if (id)
+        li.attr('id', id);
+      li.addClass('dropdown');
+      // auto add "Share" title on mobile if necessary
+      if (!title && icon && (icon === "fa-share-alt") && isMobilePhone())
+        title = "Share";
+      if (title) {
+        title = title + ' <span class="caret"></span>';
+      }
+      var a = navbarLink(icon, title, "#");
+      a.addClass('dropdown-toggle');
+      a.attr('data-toggle', 'dropdown');
+      a.attr('data-bs-toggle', 'dropdown');
+      a.attr('role', 'button');
+      a.attr('aria-expanded', 'false');
+      li.append(a);
+      var ul = $('<ul class="dropdown-menu"></ul>');
+      ul.attr('role', 'menu');
+      li.append(ul);
+      container.append(li);
+      return ul;
+    }
+  }
+
+  function addToNavbar(page, active) {
+
+    // capture the id and data-icon attribute (if any)
+    var id = page.attr('id');
+    var icon = page.attr('data-icon');
+    var navmenu = page.attr('data-navmenu');
+    var navmenuIcon = page.attr('data-navmenu-icon');
+
+    // get hidden state (transfer this to navbar)
+    var hidden = page.hasClass('hidden');
+    page.removeClass('hidden');
+
+    // sanitize the id for use with bootstrap tabs
+    id = id.replace(/[.\/?&!#<>]/g, '').replace(/\s/g, '_');
+    page.attr('id', id);
+
+    // get the wrapper
+    var wrapper = page.closest('.dashboard-page-wrapper');
+
+    // move the id to the wrapper
+    page.removeAttr('id');
+    wrapper.attr('id', id);
+
+    // add the tab-pane class to the wrapper
+    wrapper.addClass('tab-pane');
+
+    // get a reference to the h1, discover its inner contens, then detach it
+    var h1 = wrapper.find('h1').first();
+    var title = h1.contents();
+    h1.detach();
+
+    // create a navbar item
+    var li = $('<li></li>');
+    var a = navbarLink(icon, title, '#' + id);
+    a.attr('data-toggle', 'tab');
+    a.attr('data-bs-toggle', 'tab');
+    li.append(a);
+
+    // add it to the navbar (or navbar menu if specified)
+    var container = $('ul.navbar-left');
+    if (navmenu) {
+      var menuId = navmenu.replace(/\s+/g, '');
+      var menu = navbarMenu(menuId, navmenuIcon, navmenu, container);
+      li.find("> a").removeClass("nav-link").addClass("dropdown-item");
+      menu.append(li);
+    } else {
+      li.addClass("nav-item")
+      container.append(li);
+    }
+
+    // mark active tab and corresponding nav menu item
+    if (active)
+      $(a).tab("show");
+
+    // hide it if requested
+    if (hidden)
+      li.addClass('hidden');
+  }
+
+  function navbarLink(icon, title, href, target) {
+
+    var a = $('<a class="nav-link"></a>');
+    if (icon) {
+
+      // get the name of the icon set and icon
+      var dashPos = icon.indexOf("-");
+      var iconSet = null;
+      var iconSplit = icon.split(" ");
+      if (iconSplit.length > 1) {
+        iconSet = iconSplit[0];
+        icon = iconSplit.slice(1).join(" ");
+      } else {
+        iconSet = icon.substring(0, dashPos);
+      }
+      var iconName = icon.substring(dashPos + 1);
+
+      // create the icon
+      var iconElement = $('<span class="' + iconSet + ' ' + icon + '"></span>');
+      if (title)
+        iconElement.css('margin-right', '7px');
+      a.append(iconElement);
+      // if href is null see if we can auto-generate based on icon (e.g. social)
+      if (!href)
+        maybeGenerateLinkFromIcon(iconName, a);
+    }
+    if (title)
+      a.append(title);
+
+    // add the href.
+    if (href) {
+      if (href === "source_embed") {
+        a.attr('href', '#');
+        a.attr('data-featherlight', "#flexdashboard-source-code");
+        a.featherlight({
+            beforeOpen: function(event){
+              $('body').addClass('unselectable');
+            },
+            afterClose: function(event){
+              $('body').removeClass('unselectable');
+            }
+        });
+      } else {
+        a.attr('href', href);
+      }
+    }
+
+    // add the arget
+    if (target)
+      a.attr('target', target);
+
+    return a;
+  }
+
+  // auto generate a link from an icon name (e.g. twitter) when possible
+  function maybeGenerateLinkFromIcon(iconName, a) {
+
+     var serviceLinks = {
+      "twitter": "https://twitter.com/share?text=" + encodeURIComponent(document.title) + "&url="+encodeURIComponent(location.href),
+      "facebook": "https://www.facebook.com/sharer/sharer.php?u="+encodeURIComponent(location.href),
+      "linkedin": "https://www.linkedin.com/shareArticle?mini=true&url="+encodeURIComponent(location.href) + "&title=" + encodeURIComponent(document.title),
+      "pinterest": "https://pinterest.com/pin/create/link/?url="+encodeURIComponent(location.href) + "&description=" + encodeURIComponent(document.title)
+    };
+
+    var makeSocialLink = function(a, href) {
+      a.attr('href', '#');
+      a.on('click', function(e) {
+        e.preventDefault();
+        window.open(href);
+      });
+    };
+
+    $.each(serviceLinks, function(key, value) {
+      if (iconName.indexOf(key) !== -1)
+        makeSocialLink(a, value);
+    });
+  }
+
+  // layout a dashboard page
+  function layoutDashboardPage(page) {
+
+    // use a page wrapper so that free form content above the
+    // dashboard appears at the top rather than the side (as it
+    // would without the wrapper in a column orientation)
+    var wrapper = $('<div class="dashboard-page-wrapper"></div>');
+    page.wrap(wrapper);
+
+    // if there are no level2 or level3 headers synthesize a level3
+    // header to contain the (e.g. frame it, scroll container, etc.)
+    var headers = page.find('h2,h3');
+    if (headers.length === 0)
+      page.wrapInner('<div class="section level3"></div>');
+
+    // hoist up any content before level 2 or level 3 headers
+    var children = page.children();
+    children.each(function(index) {
+      if ($(this).hasClass('level2') || $(this).hasClass('level3'))
+        return false;
+      $(this).insertBefore(page);
+    });
+
+    // determine orientation and fillPage behavior for distinct media
+    var orientation, fillPage, storyboard;
+
+    // media: mobile phone
+    if (isMobilePhone()) {
+
+      // if there is a sidebar we need to ensure it's content
+      // is properly framed as an h3
+      var sidebar = page.find('.section.sidebar');
+      sidebar.removeClass('sidebar');
+      sidebar.wrapInner('<div class="section level3"></div>');
+      var h2 = sidebar.find('h2');
+      var h3 = $('<h3></h3>');
+      h3.append(h2.contents());
+      h3.insertBefore(h2);
+      h2.detach();
+
+      // wipeout h2 elements then enclose them in a single h2
+      var level2 = page.find('div.section.level2');
+      level2.each(function() {
+        level2.children('h2').remove();
+        level2.children().unwrap();
+      });
+      page.wrapInner('<div class="section level2"></div>');
+
+      // substitute mobile images
+      if (isPortrait()) {
+        var mobileFigures = $('img.mobile-figure');
+        mobileFigures.each(function() {
+          // get the src (might be base64 encoded)
+          var src = $(this).attr('src');
+
+          // find it's peer
+          var id = $(this).attr('data-mobile-figure-id');
+          var img = $('img[data-figure-id=' + id + "]");
+          img.attr('src', src)
+             .attr('width', _options.defaultFigWidthMobile)
+             .attr('height', _options.defaultFigHeightMobile);
+        });
+      }
+
+      // hoist storyboard commentary into it's own section
+      if (page.hasClass('storyboard')) {
+        var commentaryHR = page.find('div.section.level3 hr');
+        commentaryHR.each(function() {
+          var commentary = $(this).nextAll().detach();
+          var commentarySection = $('<div class="section level3"></div>');
+          commentarySection.append(commentary);
+          commentarySection.insertAfter($(this).closest('div.section.level3'));
+          $(this).remove();
+        });
+      }
+
+      // force a non full screen layout by columns
+      orientation = _options.orientation = 'columns';
+      fillPage = _options.fillPage = false;
+      storyboard = _options.storyboard = false;
+
+    // media: desktop
+    } else {
+
+      // determine orientation
+      orientation = page.attr('data-orientation');
+      if (orientation !== 'rows' && orientation != 'columns')
+        orientation = _options.orientation;
+
+      // determine storyboard mode
+      storyboard = page.hasClass('storyboard');
+
+      // fillPage based on options (force for storyboard)
+      fillPage = _options.fillPage || storyboard;
+
+      // handle sidebar
+      var sidebar = page.find('.section.level2.sidebar');
+      if (sidebar.length > 0)
+        layoutSidebar(sidebar, page);
+    }
+
+    // give it and it's parent divs height: 100% if we are in fillPage mode
+    if (fillPage) {
+      page.addClass('vertical-layout-fill');
+      page.css('height', '100%');
+      page.parents('div').css('height', '100%');
+    } else {
+      page.addClass('vertical-layout-scroll');
+    }
+
+    // perform the layout
+    if (storyboard)
+      layoutPageAsStoryboard(page);
+    else if (orientation === 'rows')
+      layoutPageByRows(page, fillPage);
+    else if (orientation === 'columns')
+      layoutPageByColumns(page, fillPage);
+  }
+
+  function layoutSidebar(sidebar, content) {
+
+    // get it out of the header hierarchy
+    sidebar = sidebar.first();
+    if (sidebar.hasClass('level1')) {
+      sidebar.removeClass('level1');
+      sidebar.children('h1').remove();
+    } else if (sidebar.hasClass('level2')) {
+      sidebar.removeClass('level2');
+      sidebar.children('h2').remove();
+    }
+
+    // determine width
+    var sidebarWidth = isTablet() ? 220 : 250;
+    var dataWidth = parseInt(sidebar.attr('data-width'));
+    if (dataWidth)
+      sidebarWidth = dataWidth;
+
+    // set the width and shift the page right to accomodate the sidebar
+    sidebar.css('width', sidebarWidth + 'px');
+    content.css('padding-left', sidebarWidth + 'px');
+
+    // wrap it's contents in a form
+    sidebar.wrapInner($('<form></form>'));
+  }
+
+  function layoutPageAsStoryboard(page) {
+
+    // create storyboard navigation
+    var nav = $('<div class="storyboard-nav"></div>');
+
+    // add navigation buttons
+    var prev = $('<button class="sbprev"><i class="fa fa-angle-left"></i></button>');
+    nav.append(prev);
+    var next= $('<button class="sbnext"><i class="fa fa-angle-right"></i></button>');
+    nav.append(next);
+
+    // add navigation frame
+    var frameList = $('<div class="sbframelist"></div>');
+    nav.append(frameList);
+    var ul = $('<ul></ul>');
+    frameList.append(ul);
+
+     // find all the level3 sections (those are the storyboard frames)
+    var frames = page.find('div.section.level3');
+    frames.each(function() {
+
+      // mark it
+      $(this).addClass('sbframe');
+
+      // divide it into chart content and (optional) commentary
+      $(this).addClass('dashboard-column-orientation');
+
+      // stuff the chart into it's own div w/ flex
+      $(this).wrapInner('<div class="sbframe-component"></div>');
+      setFlex($(this), 1);
+      var frame = $(this).children('.sbframe-component');
+
+      // extract the title from the h3
+      var li = $('<li></li>');
+      var h3 = frame.children('h3');
+      li.append(h3.contents());
+      h3.detach();
+      ul.append(li);
+
+      // extract commentary
+      var hr = frame.children('hr');
+      if (hr.length) {
+        var commentary = hr.nextAll().detach();
+        hr.remove();
+        var commentaryFrame = $('<div class="sbframe-commentary"></div>');
+        commentaryFrame.addClass('flowing-content-shim');
+        commentaryFrame.addClass('flowing-content-container');
+        commentaryFrame.append(commentary);
+        $(this).append(commentaryFrame);
+
+        // look for a data-commentary-width attribute
+        var commentaryWidth = $(this).attr('data-commentary-width');
+        if (commentaryWidth)
+          commentaryFrame.css('width', commentaryWidth + 'px');
+      }
+
+      // layout the chart (force flex)
+      var result = layoutChart(frame, true);
+
+      // ice the notes if there are none
+      if (!result.notes)
+        frame.find('.chart-notes').remove();
+
+      // set flex on chart
+      setFlex(frame, 1);
+    });
+
+    // create a div to hold all the frames
+    var frameContent = $('<div class="sbframe-content"></div>');
+    frameContent.addClass('dashboard-row-orientation');
+    frameContent.append(frames.detach());
+
+    // row orientation to stack nav and frame content
+    page.addClass('dashboard-row-orientation');
+    page.append(nav);
+    page.append(frameContent);
+    setFlex(frameContent, 1);
+
+    // initialize sly
+    var sly = new Sly(frameList, {
+    		horizontal: true,
+    		itemNav: 'basic',
+    		smart: true,
+    		activateOn: 'click',
+    		startAt: 0,
+    		scrollBy: 1,
+    		activatePageOn: 'click',
+    		speed: 200,
+    		moveBy: 600,
+    		dragHandle: true,
+    		dynamicHandle: true,
+    		clickBar: true,
+    		keyboardNavBy: 'items',
+    		next: next,
+    		prev: prev
+    	}).init();
+
+    // make first frame active
+    frames.removeClass('active');
+    frames.first().addClass('active');
+
+    // subscribe to frame changed events
+    sly.on('active', function (eventName, itemIndex) {
+      frames.removeClass('active');
+      frames.eq(itemIndex).addClass('active')
+                          .trigger('shown');
+    });
+  }
+
+  function layoutPageByRows(page, fillPage) {
+
+    // row orientation
+    page.addClass('dashboard-row-orientation');
+
+    // find all the level2 sections (those are the rows)
+    var rows = page.find('div.section.level2');
+
+    // if there are no level2 sections then treat the
+    // entire page as if it's a level 2 section
+    if (rows.length === 0) {
+      page.wrapInner('<div class="section level2"></div>');
+      rows = page.find('div.section.level2');
+    }
+
+    rows.each(function () {
+
+      // flags
+      var haveNotes = false;
+      var haveFlexHeight = true;
+
+      // remove the h2
+      $(this).children('h2').remove();
+
+      // check for a tabset
+      var isTabset = $(this).hasClass('tabset');
+      if (isTabset)
+        layoutTabset($(this));
+
+      // give it row layout semantics if it's not a tabset
+      if (!isTabset)
+        $(this).addClass('dashboard-row');
+
+      // find all of the level 3 subheads
+      var columns = $(this).find('div.section.level3');
+
+      // determine figureSizes sizes
+      var figureSizes = chartFigureSizes(columns);
+
+      // fixup the columns
+      columns.each(function(index) {
+
+        // layout the chart (force flex if we are in a tabset)
+        var result = layoutChart($(this), isTabset);
+
+        // update flexHeight state
+        if (!result.flex)
+          haveFlexHeight = false;
+
+        // update state
+        if (result.notes)
+          haveNotes = true;
+
+        // set the column flex based on the figure width
+        // (value boxes will just get the default figure width)
+        var chartWidth = figureSizes[index].width;
+        setFlex($(this), chartWidth + ' ' + chartWidth + ' 0px');
+
+      });
+
+      // remove empty chart note divs
+      if (isTabset)
+        $(this).find('.chart-notes').filter(function() {
+            return $(this).html() === "&nbsp;";
+        }).remove();
+      if (!haveNotes)
+        $(this).find('.chart-notes').remove();
+
+       // make it a flexbox row
+      if (haveFlexHeight)
+        $(this).addClass('dashboard-row-flex');
+
+      // now we can set the height on all the wrappers (based on maximum
+      // figure height + room for title and notes, or data-height on the
+      // container if specified). However, don't do this if there is
+      // no flex on any of the constituent columns
+      var flexHeight = null;
+      var dataHeight = parseInt($(this).attr('data-height'));
+      if (dataHeight)
+        flexHeight = adjustedHeight(dataHeight, columns.first());
+      else if (haveFlexHeight)
+        flexHeight = maxChartHeight(figureSizes, columns);
+      if (flexHeight) {
+        if (fillPage)
+          setFlex($(this), flexHeight + ' ' + flexHeight + ' 0px');
+        else {
+          $(this).css('height', flexHeight + 'px');
+          setFlex($(this), '0 0 ' + flexHeight + 'px');
+        }
+      }
+
+    });
+  }
+
+  function layoutPageByColumns(page, fillPage) {
+
+    // column orientation
+    page.addClass('dashboard-column-orientation');
+
+    // find all the level2 sections (those are the columns)
+    var columns = page.find('div.section.level2');
+
+    // if there are no level2 sections then treat the
+    // entire page as if it's a level 2 section
+    if (columns.length === 0) {
+      page.wrapInner('<div class="section level2"></div>');
+      columns = page.find('div.section.level2');
+    }
+
+    // layout each column
+    columns.each(function (index) {
+
+      // remove the h2
+      $(this).children('h2').remove();
+
+      // make it a flexbox column
+      $(this).addClass('dashboard-column');
+
+      // check for a tabset
+      var isTabset = $(this).hasClass('tabset');
+      if (isTabset)
+        layoutTabset($(this));
+
+      // find all the h3 elements
+      var rows = $(this).find('div.section.level3');
+
+      // get the figure sizes for the rows
+      var figureSizes = chartFigureSizes(rows);
+
+      // column flex is the max row width (or data-width if specified)
+      var flexWidth;
+      var dataWidth = parseInt($(this).attr('data-width'));
+      if (dataWidth)
+        flexWidth = dataWidth;
+      else
+        flexWidth = maxChartWidth(figureSizes);
+      setFlex($(this), flexWidth + ' ' + flexWidth + ' 0px');
+
+      // layout each chart
+      rows.each(function(index) {
+
+        // perform the layout
+        var result = layoutChart($(this), false);
+
+        // ice the notes if there are none
+        if (!result.notes)
+          $(this).find('.chart-notes').remove();
+
+        // set flex height based on figHeight, then adjust
+        if (result.flex) {
+          var chartHeight = figureSizes[index].height;
+          chartHeight = adjustedHeight(chartHeight, $(this));
+          if (fillPage)
+            setFlex($(this), chartHeight + ' ' + chartHeight + ' 0px');
+          else {
+            $(this).css('height', chartHeight + 'px');
+            setFlex($(this), chartHeight + ' ' + chartHeight + ' ' + chartHeight + 'px');
+          }
+        }
+      });
+    });
+  }
+
+  function chartFigureSizes(charts) {
+
+    // sizes
+    var figureSizes = new Array(charts.length);
+
+    // check each chart
+    charts.each(function(index) {
+
+      // start with default
+      figureSizes[index] = {
+        width: _options.defaultFigWidth,
+        height: _options.defaultFigHeight
+      };
+
+      // look for data-height or data-width then knit options
+      var dataWidth = parseInt($(this).attr('data-width'));
+      var dataHeight = parseInt($(this).attr('data-height'));
+      var knitrOptions = $(this).find('.knitr-options:first');
+      var knitrWidth, knitrHeight;
+      if (knitrOptions) {
+        knitrWidth = parseInt(knitrOptions.attr('data-fig-width'));
+        knitrHeight =  parseInt(knitrOptions.attr('data-fig-height'));
+      }
+
+      // width
+      if (dataWidth)
+        figureSizes[index].width = dataWidth;
+      else if (knitrWidth)
+        figureSizes[index].width = knitrWidth;
+
+      // height
+      if (dataHeight)
+        figureSizes[index].height = dataHeight;
+      else if (knitrHeight)
+        figureSizes[index].height = knitrHeight;
+    });
+
+    // return sizes
+    return figureSizes;
+  }
+
+  function maxChartHeight(figureSizes, charts) {
+
+    // first compute the maximum height
+    var maxHeight = _options.defaultFigHeight;
+    for (var i = 0; i<figureSizes.length; i++)
+      if (figureSizes[i].height > maxHeight)
+        maxHeight = figureSizes[i].height;
+
+    // now add offests for chart title and chart notes
+    if (charts.length)
+      maxHeight = adjustedHeight(maxHeight, charts.first());
+
+    return maxHeight;
+  }
+
+  function adjustedHeight(height, chart) {
+    if (chart.length > 0) {
+      var chartTitle = chart.find('.chart-title');
+      if (chartTitle.length)
+        height += chartTitle.first().outerHeight();
+      var chartNotes = chart.find('.chart-notes');
+      if (chartNotes.length)
+        height += chartNotes.first().outerHeight();
+    }
+    return height;
+  }
+
+  function maxChartWidth(figureSizes) {
+    var maxWidth = _options.defaultFigWidth;
+    for (var i = 0; i<figureSizes.length; i++)
+      if (figureSizes[i].width > maxWidth)
+        maxWidth = figureSizes[i].width;
+    return maxWidth;
+  }
+
+  // layout a chart
+  function layoutChart(chart, forceFlex) {
+
+    // state to return
+    var result = {
+      notes: false,
+      flex: false
+    };
+
+    // extract the title
+    var title = extractTitle(chart);
+
+    // find components that apply to this container
+    var components = componentsFind(chart);
+
+    // if it's a custom component then call it and return
+    var customComponents = componentsCustom(components);
+    if (customComponents.length) {
+      componentsLayout(customComponents, title, chart);
+      result.notes = false;
+      result.flex = forceFlex || componentsFlex(customComponents);
+      return result;
+    }
+
+    // put all the content in a chart wrapper div
+    chart.addClass('chart-wrapper');
+    chart.wrapInner('<div class="chart-stage"></div>');
+    var chartContent = chart.children('.chart-stage');
+
+    // flex the content if appropriate
+    result.flex = forceFlex || componentsFlex(components);
+    if (result.flex) {
+      // add flex classes
+      chart.addClass('chart-wrapper-flex');
+      chartContent.addClass('chart-stage-flex');
+
+      // additional shim to break out of flexbox sizing
+      chartContent.wrapInner('<div class="chart-shim"></div>');
+      chartContent = chartContent.children('.chart-shim');
+    }
+
+    // set custom data-padding attribute
+    var pad = chart.attr('data-padding');
+    if (pad) {
+      if (pad === "0")
+        chart.addClass('no-padding');
+      else {
+        pad = pad + 'px';
+        chartContent.css('left', pad)
+                    .css('top', pad)
+                    .css('right', pad)
+                    .css('bottom', pad)
+      }
+    }
+
+    // call compoents
+    componentsLayout(components, title, chartContent);
+
+    // also activate components on shiny output
+    findShinyOutput(chartContent).on('shiny:value',
+      function(event) {
+        var element = $(event.target);
+        setTimeout(function() {
+
+          // see if we opted out of flex based on our output (for shiny
+          // we can't tell what type of output we have until after the
+          // value is bound)
+          var components = componentsFind(element);
+          var flex = forceFlex || componentsFlex(components);
+          if (!flex) {
+            chart.css('height', "");
+            setFlex(chart, "");
+            chart.removeClass('chart-wrapper-flex');
+            chartContent.removeClass('chart-stage-flex');
+            chartContent.children().unwrap();
+          }
+
+          // perform layout
+          componentsLayout(components, title, element.parent());
+        }, 10);
+      });
+
+    // add the title
+    var chartTitle = $('<div class="chart-title"></div>');
+    chartTitle.append(title);
+    chart.prepend(chartTitle);
+
+    // add the notes section
+    var chartNotes = $('<div class="chart-notes"></div>');
+    chartNotes.html('&nbsp;');
+    chart.append(chartNotes);
+
+    // attempt to extract notes if we have a component
+    if (components.length)
+      result.notes = extractChartNotes(chartContent, chartNotes);
+
+    // return result
+    return result;
+  }
+
+  // build a tabset from a section div with the .tabset class
+  function layoutTabset(tabset) {
+
+    // check for fade option
+    var fade = tabset.hasClass("tabset-fade");
+    var pills = tabset.hasClass("tabset-pills");
+    var navClass = pills ? "nav-pills" : "nav-tabs";
+
+    // determine the heading level of the tabset and tabs
+    var match = tabset.attr('class').match(/level(\d) /);
+    if (match === null)
+      return;
+    var tabsetLevel = Number(match[1]);
+    var tabLevel = tabsetLevel + 1;
+
+    // find all subheadings immediately below
+    var tabs = tabset.find("div.section.level" + tabLevel);
+    if (!tabs.length)
+      return;
+
+    // create tablist and tab-content elements
+    var tabList = $('<ul class="nav ' + navClass + '" role="tablist"></ul>');
+    $(tabs[0]).before(tabList);
+    var tabContent = $('<div class="tab-content"></div>');
+    $(tabs[0]).before(tabContent);
+
+    // build the tabset
+    var activeTab = 0;
+    tabs.each(function(i) {
+
+      // get the tab div
+      var tab = $(tabs[i]);
+
+      // get the id then sanitize it for use with bootstrap tabs
+      var id = tab.attr('id');
+
+      // see if this is marked as the active tab
+      if (tab.hasClass('active'))
+        activeTab = i;
+
+      // sanitize the id for use with bootstrap tabs
+      id = id.replace(/[.\/?&!#<>]/g, '').replace(/\s/g, '_');
+      tab.attr('id', id);
+
+      // get the heading element within it and grab it's text
+      var heading = tab.find('h' + tabLevel + ':first');
+      var headingDom = heading.contents();
+
+      // build and append the tab list item
+      var a = $('<a role="tab" data-toggle="tab" data-bs-toggle="tab" class="nav-link"></a>');
+      a.append(headingDom);
+      a.attr('href', '#' + id);
+      a.attr('aria-controls', id);
+      var li = $('<li role="presentation" class="nav-item"></li>');
+      li.append(a);
+      tabList.append(li);
+
+      // set it's attributes
+      tab.attr('role', 'tabpanel');
+      tab.addClass('tab-pane');
+      tab.addClass('tabbed-pane');
+      tab.addClass('no-title');
+      if (fade)
+        tab.addClass('fade');
+
+      // move it into the tab content div
+      tab.detach().appendTo(tabContent);
+    });
+
+    // set active tab
+    $(tabList.children()[activeTab]).tab("show");
+    var active = $(tabContent.children('div.section')[activeTab]);
+    active.addClass('active');
+    if (fade)
+      active.addClass('in');
+
+    // add nav-tabs-custom
+    tabset.addClass('nav-tabs-custom');
+
+    // internal layout is dashboard-column with tab-content flexing
+    tabset.addClass('dashboard-column');
+    setFlex(tabContent, 1);
+  }
+
+  // one time global initialization for components
+  function componentsInit(dashboardContainer) {
+    for (var i=0; i<window.FlexDashboardComponents.length; i++) {
+      var component = window.FlexDashboardComponents[i];
+      if (component.init)
+        component.init(dashboardContainer);
+    }
+  }
+
+  // find components that apply within a container
+  function componentsFind(container) {
+
+    // look for components
+    var components = [];
+    for (var i=0; i<window.FlexDashboardComponents.length; i++) {
+      var component = window.FlexDashboardComponents[i];
+      if (component.find(container).length)
+        components.push(component);
+    }
+
+    // if there were none then use a special flowing content component
+    // that just adds a scrollbar in fillPage mode
+    if (components.length == 0) {
+      components.push({
+        find: function(container) {
+          return container;
+        },
+
+        flex: function(fillPage) {
+          return fillPage;
+        },
+
+        layout: function(title, container, element, fillPage) {
+          if (fillPage) {
+            container.addClass('flowing-content-shim');
+            container.addClass('flowing-content-container');
+          }
+        }
+      });
+    }
+
+    return components;
+  }
+
+  // if there is a custom component then pick it out
+  function componentsCustom(components) {
+    var customComponent = [];
+    for (var i=0; i<components.length; i++)
+      if (components[i].type === "custom") {
+        customComponent.push(components[i]);
+        break;
+      }
+    return customComponent;
+  }
+
+  // query all components for flex
+  function componentsFlex(components) {
+
+    // no components at all means no flex
+    if (components.length === 0)
+      return false;
+
+    // otherwise query components (assume true unless we see false)
+    var isMobile = isMobilePhone();
+    for (var i=0; i<components.length; i++)
+      if (components[i].flex && !components[i].flex(_options.fillPage))
+        return false;
+    return true;
+  }
+
+  // layout all components
+  function componentsLayout(components, title, container) {
+    var isMobile = isMobilePhone();
+    for (var i=0; i<components.length; i++) {
+      var element = components[i].find(container);
+      if (components[i].layout) {
+        // call layout (don't call other components if it returns false)
+        var result = components[i].layout(title, container, element, _options.fillPage);
+        if (result === false)
+          return;
+      }
+    }
+  }
+
+  // get a reference to the h3, discover it's inner html, and remove it
+  function extractTitle(container) {
+    var h3 = container.children('h3').first();
+    var title = '';
+    if (!container.hasClass('no-title'))
+      title = h3.contents();
+    h3.detach();
+    return title;
+  }
+
+  // extract chart notes
+  function extractChartNotes(chartContent, chartNotes) {
+    // look for a terminating blockquote or image caption
+    var blockquote = chartContent.children('blockquote:last-child');
+    var caption = chartContent.children('div.image-container')
+                              .children('p.caption');
+    if (blockquote.length) {
+      chartNotes.empty().append(blockquote.children('p:first-child').contents());
+      blockquote.remove();
+      return true;
+    } else if (caption.length) {
+      chartNotes.empty().append(caption.contents());
+      caption.remove();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  function findShinyOutput(chartContent) {
+    return chartContent.find('.shiny-text-output, .shiny-html-output');
+  }
+
+  // safely detect rendering on a mobile phone
+  function isMobilePhone() {
+    try
+    {
+      return ! window.matchMedia("only screen and (min-width: 768px)").matches;
+    }
+    catch(e) {
+      return false;
+    }
+  }
+
+  function isFillPage() {
+    return _options.fillPage;
+  }
+
+  // detect portrait mode
+  function isPortrait() {
+    return ($(window).width() < $(window).height());
+  }
+
+  // safely detect rendering on a tablet
+  function isTablet() {
+    try
+    {
+      return window.matchMedia("only screen and (min-width: 769px) and (max-width: 992px)").matches;
+    }
+    catch(e) {
+      return false;
+    }
+  }
+
+  // test whether this is a shiny doc
+  function isShinyDoc() {
+    return (typeof(window.Shiny) !== "undefined" && !!window.Shiny.outputBindings);
+  }
+
+  // set flex using vendor specific prefixes
+  function setFlex(el, flex) {
+    el.css('-webkit-box-flex', flex)
+      .css('-webkit-flex', flex)
+      .css('-ms-flex', flex)
+      .css('flex', flex);
+  }
+
+  // support bookmarking of pages
+  function handleLocationHash() {
+
+    // restore tab/page from bookmark
+    var hash = window.decodeURIComponent(window.location.hash);
+    if (hash.length > 0) {
+      // Update the tab without .showPage() so that we don't change page history
+      $('ul.nav a[href="' + hash + '"]').tab('show');
+    }
+
+    // navigate to a tab when the history changes
+    window.addEventListener("popstate", function(e) {
+      var hash = window.decodeURIComponent(window.location.hash);
+      var activeTab = $('ul.nav a[href="' + hash + '"]');
+      if (activeTab.length) {
+        activeTab.tab('show');
+      } else {
+        // returning to the base page URL without a hash activates first tab
+        $('ul.nav a:first').tab('show');
+      }
+    });
+
+    // add a hash to the URL when the user clicks on a tab/page
+    $('.navbar-nav a[data-toggle="tab"]').on('click', function(e) {
+      var baseUrl = FlexDashboardUtils.urlWithoutHash(window.location.href);
+      var hash = FlexDashboardUtils.urlHash($(this).attr('href'));
+      var href = baseUrl + hash;
+      FlexDashboardUtils.setLocation(href);
+    });
+
+    // handle clicks of other links that should activate pages
+    var navPages = $('ul.navbar-nav li a[data-toggle=tab]');
+    navPages.each(function() {
+      var href =  $(this).attr('href');
+      var links = $('a[href="' + href + '"][data-toggle!=tab]');
+      links.each(function() {
+        $(this).on('click', function(e) {
+          window.FlexDashboardUtils.showPage(href);
+        });
+      });
+    });
+  }
+
+  // tweak Prism highlighting
+  function initPrismHighlighting() {
+
+    if (window.Prism) {
+      Prism.languages.insertBefore('r', 'comment', {
+        'heading': [
+          {
+            // title 1
+        	  // =======
+
+        	  // title 2
+        	  // -------
+        	  pattern: /\w+.*(?:\r?\n|\r)(?:====+|----+)/,
+            alias: 'operator'
+          },
+          {
+            // ### title 3
+            pattern: /(^\s*)###[^#].+/m,
+            lookbehind: true,
+            alias: 'operator'
+          }
+        ]
+      });
+
+      // prism highlight
+      Prism.highlightAll();
+    }
+  }
+
+  FlexDashboard.prototype = {
+    constructor: FlexDashboard,
+    init: init,
+    isMobilePhone: isMobilePhone,
+    isFillPage: isFillPage
+  };
+
+  return FlexDashboard;
+
+})();
+
+// utils
+window.FlexDashboardUtils = {
+  resizableImage: function(img) {
+    var src = img.attr('src');
+    var url = 'url("' + src + '")';
+    img.parent().css('background', url)
+                .css('background-size', 'contain')
+                .css('background-repeat', 'no-repeat')
+                .css('background-position', 'center')
+                .addClass('image-container');
+  },
+  setLocation: function(href) {
+    if (history && history.pushState) {
+      history.pushState(null, null, href);
+    } else {
+      window.location.replace(href);
+    }
+    setTimeout(function() {
+        window.scrollTo(0, 0);
+    }, 10);
+  },
+  showPage: function(href) {
+    $('ul.navbar-nav li a[href="' + href + '"]').tab('show');
+    var baseUrl = this.urlWithoutHash(window.location.href);
+    var loc = baseUrl + href;
+    this.setLocation(loc);
+  },
+  showLinkedValue: function(href) {
+    // check for a page link
+    if ($('ul.navbar-nav li a[data-toggle=tab][href="' + href + '"]').length > 0)
+      this.showPage(href);
+    else
+      window.open(href);
+  },
+  urlWithoutHash: function(url) {
+    var hashLoc = url.indexOf('#');
+    if (hashLoc != -1)
+      return url.substring(0, hashLoc);
+    else
+      return url;
+  },
+  urlHash: function(url) {
+    var hashLoc = url.indexOf('#');
+    if (hashLoc != -1)
+      return url.substring(hashLoc);
+    else
+      return "";
+  }
+};
+
+window.FlexDashboard = new FlexDashboard();
+
+// empty content
+window.FlexDashboardComponents.push({
+  find: function(container) {
+    if (container.find('p').length == 0)
+      return container;
+    else
+      return $();
+  }
+})
+
+// plot image
+window.FlexDashboardComponents.push({
+
+  find: function(container) {
+    return container.children('p')
+                    .children('img:only-child');
+  },
+
+  layout: function(title, container, element, fillPage) {
+    FlexDashboardUtils.resizableImage(element);
+  }
+});
+
+// plot image (figure style)
+window.FlexDashboardComponents.push({
+
+  find: function(container) {
+    return container.children('div.figure').children('img');
+  },
+
+  layout: function(title, container, element, fillPage) {
+    FlexDashboardUtils.resizableImage(element);
+  }
+});
+
+// htmlwidget
+window.FlexDashboardComponents.push({
+
+  init: function(dashboardContainer) {
+    // trigger "shown" after initial layout to force static htmlwidgets
+    // in runtime: shiny to be resized after the dom has been transformed
+    dashboardContainer.on('flexdashboard:layoutcomplete', function(event) {
+      setTimeout(function() {
+        dashboardContainer.trigger('shown');
+      }, 200);
+    });
+  },
+
+  find: function(container) {
+    return container.children('div[id^="htmlwidget-"],div.html-widget');
+  }
+});
+
+// gauge
+window.FlexDashboardComponents.push({
+
+  find: function(container) {
+    return container.children('div.html-widget.gauge');
+  },
+
+  flex: function(fillPage) {
+    return false;
+  },
+
+  layout: function(title, container, element, fillPage) {
+
+
+  }
+
+});
+
+// shiny output
+window.FlexDashboardComponents.push({
+  find: function(container) {
+    return container.children('div[class^="shiny-"]');
+  }
+});
+
+// bootstrap table
+window.FlexDashboardComponents.push({
+
+  find: function(container) {
+    var bsTable = container.find('table.table');
+    if (bsTable.length !== 0)
+      return bsTable;
+    else
+      return container.find('tr.header').parent('thead').parent('table');
+  },
+
+  flex: function(fillPage) {
+    return fillPage;
+  },
+
+  layout: function(title, container, element, fillPage) {
+
+    // alias variables
+    var bsTable = element;
+
+    // fixup xtable generated tables with a proper thead
+    var headerRow = bsTable.find('tbody > tr:first-child > th').parent();
+    if (headerRow.length > 0) {
+      var thead = $('<thead></thead>');
+      bsTable.prepend(thead);
+      headerRow.detach().appendTo(thead);
+    }
+
+    // improve appearance
+    container.addClass('bootstrap-table');
+
+    // for fill page provide scrolling w/ sticky headers
+    if (fillPage) {
+      // force scrollbar on overflow
+      container.addClass('flowing-content-shim');
+
+      // stable table headers when scrolling
+      bsTable.stickyTableHeaders({
+        scrollableArea: container
+      });
+    }
+  }
+});
+
+// embedded shiny app
+window.FlexDashboardComponents.push({
+
+  find: function(container) {
+    return container.find('iframe.shiny-frame');
+  },
+
+  flex: function(fillPage) {
+    return fillPage;
+  },
+
+  layout: function(title, container, element, fillPage) {
+    if (fillPage) {
+      element.attr('height', '100%');
+    } else {
+      // provide default height if necessary
+      var height = element.get(0).style.height;
+      if (!height)
+        height = element.attr('height');
+      if (!height)
+        element.attr('height', 500);
+    }
+  }
+});
+
+// shiny fillRow or fillCol
+window.FlexDashboardComponents.push({
+
+  find: function(container) {
+    return container.find('.flexfill-container');
+  },
+
+  flex: function(fillPage) {
+    return fillPage;
+  },
+
+  layout: function(title, container, element, fillPage) {
+    if (fillPage)
+      element.css('height', '100%');
+    else {
+      // provide default height if necessary
+      var height = element.get(0).style.height;
+      if (height === "100%" || height === "auto" || height === "initial" ||
+          height === "inherit" || !height) {
+        element.css('height', 500);
+      }
+    }
+  }
+});
+
+// valueBox
+window.FlexDashboardComponents.push({
+
+  type: "custom",
+
+  find: function(container) {
+    if (container.find('span.value-output, .shiny-valuebox-output').length)
+      return container;
+    else
+      return $();
+  },
+
+  flex: function(fillPage) {
+    return false;
+  },
+
+  layout: function(title, container, element, fillPage) {
+
+    // alias variables
+    var chartTitle = title;
+    var valueBox = element;
+
+    // add value-box class to container
+    container.addClass('value-box');
+
+    // value paragraph
+    var value = $('<p class="value"></p>');
+
+    // if we have shiny-text-output then just move it in
+    var valueOutputSpan = [];
+    var shinyOutput = valueBox.find('.shiny-valuebox-output').detach();
+    if (shinyOutput.length) {
+      valueBox.children().remove();
+      shinyOutput.html("&mdash;");
+      value.append(shinyOutput);
+    } else {
+      // extract the value (remove leading vector index)
+      var chartValue = valueBox.text().trim();
+      chartValue = chartValue.replace("[1] ", "");
+      valueOutputSpan = valueBox.find('span.value-output').detach();
+      valueBox.children().remove();
+      value.text(chartValue);
+    }
+
+    // caption
+    var caption = $('<p class="caption"></p>');
+    caption.append(chartTitle);
+
+    // build inner div for value box and add it
+    var inner = $('<div class="inner"></div>');
+    inner.append(value);
+    inner.append(caption);
+    valueBox.append(inner);
+
+    // add icon if specified
+    var icon = $('<div class="icon"><i></i></div>');
+    valueBox.append(icon);
+    function setIcon(chartIcon) {
+      var iconLib = "";
+      var iconSplit = chartIcon.split(" ");
+      if (iconSplit.length > 1) {
+        iconLib = iconSplit[0];
+        chartIcon = iconSplit.slice(1).join(" ");
+      } else {
+        var components = chartIcon.split("-");
+        if (components.length > 1)
+          iconLib = components[0];
+      }
+      icon.children('i').attr('class', iconLib + ' ' + chartIcon);
+    }
+    var chartIcon = valueBox.attr('data-icon');
+    if (chartIcon)
+      setIcon(chartIcon);
+
+    // handle data attributes in valueOutputSpan
+    function handleValueOutput(valueOutput) {
+
+      // caption
+      var dataCaption = valueOutput.attr('data-caption');
+      if (dataCaption)
+        caption.html(dataCaption);
+
+      // icon
+      var dataIcon = valueOutput.attr('data-icon');
+      if (dataIcon)
+        setIcon(dataIcon);
+
+      // If valueBox(color=) was an accent color, this attr should
+      // be populated with the accent color and the relevant CSS comes
+      // in through HTML dependencies
+      var dataColorAccent = valueOutput.attr('data-color-accent');
+      var valueBoxClasses = "value-box-" + (["primary", "info", "danger", "warning", "success"].join(" value-box-"));
+      if (dataColorAccent) {
+        valueBox.removeClass(valueBoxClasses);
+        valueBox.addClass('value-box-' + dataColorAccent);
+      }
+
+      // If valueBox(color=) was a CSS color, these other data-color-*
+      // attrs will be populated
+      var dataColor = valueOutput.attr('data-color');
+      if (dataColor) {
+        valueBox.removeClass(valueBoxClasses);
+        valueBox.css('background-color', dataColor);
+      }
+      var dataColorText = valueOutput.attr('data-color-text');
+      if (dataColorText) {
+        valueBox.find(".inner").css('color', dataColorText);
+      }
+      var dataColorIcon = valueOutput.attr('data-color-icon');
+      if (dataColorIcon) {
+        valueBox.find(".icon").css('color', dataColorIcon);
+      }
+
+      // url
+      var dataHref = valueOutput.attr('data-href');
+      if (dataHref) {
+        valueBox.addClass('linked-value');
+        valueBox.off('click.value-box');
+        valueBox.on('click.value-box', function(e) {
+          window.FlexDashboardUtils.showLinkedValue(dataHref);
+        });
+      }
+    }
+
+    // check for a valueOutputSpan
+    if (valueOutputSpan.length > 0) {
+      handleValueOutput(valueOutputSpan);
+    }
+
+    // if we have a shinyOutput then bind a listener to handle
+    // new valueOutputSpan values
+    shinyOutput.on('shiny:value',
+      function(event) {
+        var element = $(event.target);
+        setTimeout(function() {
+          var valueOutputSpan = element.find('span.value-output');
+          if (valueOutputSpan.length > 0)
+            handleValueOutput(valueOutputSpan);
+        }, 10);
+      }
+    );
+  }
+});
+</script>
+
+<div id="dashboard-container">
+
+<style>
+.chart-title {  /* chart_title  */
+   font-size: 16px;
+  }
+body{ /* Normal  */
+      font-size: 14px;
+  }
+</style>
+<head>
+<base target="_blank">
+</head>
+<div id="project-overview" class="section level1">
+<h1>Project Overview</h1>
+<div id="column" class="section level2" data-width="650">
+<h2>Column</h2>
+<div id="goal" class="section level3" data-height="35">
+<h3>Goal</h3>
+<div class="knitr-options" data-fig-width="576" data-fig-height="460">
+
+</div>
+<p>In this final project, we perform regression analysis using building
+specifications to estimate energy performance of buildings (EPB),
+specifically heat load and cool load. The dataset used in this work is a
+publicaly available simulated dataset found in the UC Irvine Machine
+Learning Repository (<a
+href="https://archive.ics.uci.edu/dataset/242/energy+efficiency">dataset
+link</a>). In this particular dataset, there are 12 different building
+shapes, differing with respect to the glazing area, glazing area
+distribution, and orientation, as well as some other variables.</p>
+</div>
+<div id="dataset-overview" class="section level3" data-height="30">
+<h3>Dataset Overview</h3>
+<p>In total, there are 768 observations (buildings). There are 8
+predictor variables and 2 response variables. Figure <a
+href="#intro-plot">1</a> shows a basic summary of the full dataset. From
+this plot, we find that the entire dataset is clean with no missing
+data. This is a simulated dataset that was created to investigate the
+effect of eight input variables on determining two output variables. The
+“Dataset Variables” table shows the variable names and number of
+possible values.</p>
+</div>
+<div id="simulated-building-information" class="section level3"
+data-height="70">
+<h3>Simulated Building Information</h3>
+<p>There are 12 simulated building forms in total, composed of 18
+“elements.” The following assumptions are made for all buildings:</p>
+<ul>
+<li><p>Location and occupants: Residential building in Athens, Greece,
+with 7 residents</p></li>
+<li><p>Fixed activity of 70 Watts</p></li>
+<li><p>All internal and thermal properties are the same</p></li>
+<li><p><span class="math inline">\((12 \text{ building forms } \times 3
+\text{ glazing area variations } \times 5 \text{ glazing area
+distributions } \times 4 \text{ orientations }) + (12 \text{ building
+forms } \times 4 \text{ orientations w/o glazing}) = 768 \text{
+buildings}\)</span></p></li>
+</ul>
+</div>
+<div id="project-focus" class="section level3" data-height="90">
+<h3>Project Focus</h3>
+<p>This project focuses on a specific claim made in the original work:
+classical regression analysis is insufficient for modeling with this
+dataset, hence favoring IRLS and RF. This final project aims to verify
+the claim. The end goal is to determine if the claim is true, and if so,
+how much better is IRLS and RF than classical regression analysis and
+modeling? This will be done by comparing the provided mean absolute
+error (MAE), mean square error (MSE), and mean relative error (MRE)
+values in the original work and comparing it with those found in this
+project.</p>
+<p>The first step is perform exploratory data analysis (EDA). Then, the
+best set of variables to use for modeling heating and cooling loads will
+be found using several processes. This will be done using the entire
+dataset. Once the variables for each model have been chosen, the same
+experiment conducted in the original work to determine the MAE, MSE, and
+MRE of the IRLS and RF models will be performed. This involves many
+repetitions of shuffling the dataset, creating training and testing
+splits, fitting models, and measuring errors. This will be discussed in
+further detail in the “Model Analysis” section.</p>
+<p>Before EDA, we perform a brief introduction of IRLS and RF to better
+understand how each works. This is done in the “Background” section.</p>
+</div>
+</div>
+<div id="column-1" class="section level2" data-width="350">
+<h2>Column</h2>
+<div id="introduction-plot" class="section level3" data-height="54">
+<h3>Introduction Plot</h3>
+<!-- Figure 1 -->
+<a name="intro-plot"></a>
+<div class="knitr-options" data-fig-width="864" data-fig-height="460">
+
+</div>
+<p><img src="index_files/figure-html/intro-plot-1.png" width="864" data-figure-id=fig1 /></p>
+</div>
+<div id="dataset-variables" class="section level3" data-height="46">
+<h3>Dataset Variables</h3>
+<div class="knitr-options" data-fig-width="576" data-fig-height="460">
+
+</div>
+<table style="width:93%;">
+<colgroup>
+<col width="15%" />
+<col width="38%" />
+<col width="38%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Variable Names</th>
+<th>Number of Possible Values</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>X1</td>
+<td>Relative compactness</td>
+<td>12</td>
+</tr>
+<tr class="even">
+<td>X2</td>
+<td>Surface area</td>
+<td>12</td>
+</tr>
+<tr class="odd">
+<td>X3</td>
+<td>Wall area</td>
+<td>7</td>
+</tr>
+<tr class="even">
+<td>X4</td>
+<td>Roof area</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td>X5</td>
+<td>Overall height</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td>X6</td>
+<td>Orientation</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td>X7</td>
+<td>Glazing area</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<td>X8</td>
+<td>Glazing area distribution</td>
+<td>6</td>
+</tr>
+<tr class="odd">
+<td>Y1</td>
+<td>Heating load</td>
+<td>586</td>
+</tr>
+<tr class="even">
+<td>Y2</td>
+<td>Cooling load</td>
+<td>636</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="background" class="section level1">
+<h1>Background</h1>
+<div id="column-2" class="section level2" data-width="600">
+<h2>Column</h2>
+<div id="overview" class="section level3" data-height="70">
+<h3>Overview</h3>
+<p>In the original work <span class="citation">(Tsanas and Xifara
+2012)</span>, statistical machine learning methods are used to train and
+test models on the dataset to predict heat and cool loads given all
+predictors. The reason for investigating statistical machine learning
+for this specific problem is that classical least squares regression
+techniques is unable to sufficiently model and capture the non-linear
+nature of the problem. Two methods are explored in the original work:
+iteratively reweighted least squares (IRLS) and random forest (RF).</p>
+<p>In addition, we briefly discuss why Spearman rank correlation is used
+instead of Pearson correlation.</p>
+</div>
+<div id="iteratively-reweighted-least-squares-irls"
+class="section level3" data-height="75">
+<h3>Iteratively Reweighted Least Squares (IRLS)</h3>
+<p>IRLS is simpler than RF and is a commonly used regression method. It
+works by adjusting the weights of a regression models coefficients to
+reduce the impact of outliers in data. This ultimately leads to an
+improved least squares estimate and overall model fit. More information
+on IRLS can be found in literature <span class="citation">(Bishop and
+Nasrabadi 2006; Tsanas et al. 2009)</span>. However, in applications
+where residuals do not follow a Gaussian distribution, IRLS can struggle
+to sufficiently model complex relationships. For this reason, RF is also
+used for regression analysis with this dataset.</p>
+<p>A basic flowchart of IRLS is shown in Figure <a
+href="#IRLS-flowchart">2</a>. The flowchart was generated using Google
+Gemini.</p>
+</div>
+<div id="random-forst-rf" class="section level3" data-height="95">
+<h3>Random Forst (RF)</h3>
+<p>RF is an extension of the classification and regression tree (CART).
+CART is a nonlinear method designed for classification and regression
+analysis. When response variables are categorical, it serves as a
+classification model. It can also be used to build regression trees when
+predictors are continuous, numeric values.</p>
+<p>The concept of CART is to repeatedly split an input feature space
+(predictors) into smaller sub-regions. The feature space is iteratively
+split into smaller and smaller sub-regions until it is not possible to
+split it any more, or some criterion to stop splitting has been met. RF
+is a collection of many “trees,” or a collection of CART models. To
+obtain this collection of models, a random subset of the variables are
+chosen for each model, and then the CART procedure is performed for each
+tree.</p>
+<p>A simple illustration of RF is shown in Figure <a
+href="#RF-illustration">3</a>. The illustration was generated using
+Google Gemini.</p>
+</div>
+<div id="spearman-rank-correlation" class="section level3"
+data-height="95">
+<h3>Spearman Rank Correlation</h3>
+<p>Spearman rank correlation is used instead of the Pearson correlation
+since that is what the original work chose to do. This decision was made
+because most of the predictors have non-Gaussian distributions and
+non-linear relationships. This method determines how well the
+relationship between two variables can be described using a monotonic
+function.</p>
+<!-- This method determines how well the relationship between two variables can be described using a monotonic function, i.e. a function that only ever increases or decreases, but not necessarily at a constant rate. Instead of using the raw data, each variable is converted into a set of ranks. The ranks of two variables are used to determine the correlation coefficient.  -->
+<p>The coefficient value is between -1 and 1, where a negative value
+indicates an inversely proportional relatinship and a positive value
+indicates a proportional relationship.</p>
+</div>
+</div>
+<div id="column-3" class="section level2" data-width="400">
+<h2>Column</h2>
+<div id="irls-flowchart" class="section level3" data-height="400">
+<h3>IRLS Flowchart</h3>
+<!-- Figure 2 -->
+<a name="IRLS-flowchart"></a>
+<div class="knitr-options" data-fig-width="576" data-fig-height="460">
+
+</div>
+<p><img src="Figures/IRLS_Flowchart.png" width="576" data-figure-id=fig2 /></p>
+</div>
+<div id="rf-illustration" class="section level3" data-height="600">
+<h3>RF Illustration</h3>
+<!-- Figure 3 -->
+<a name="RF-illustration"></a>
+<div class="knitr-options" data-fig-width="576" data-fig-height="460">
+
+</div>
+<p><img src="Figures/RF_Regression.png" width="576" data-figure-id=fig2 /></p>
+</div>
+</div>
+</div>
+<div id="eda" class="section level1">
+<h1>EDA</h1>
+<div id="column-4" class="section level2" data-width="375">
+<h2>Column</h2>
+<div id="investigating-the-data" class="section level3">
+<h3>Investigating the Data</h3>
+<p>We begin with EDA of the full dataset. Discussion and conclusions and
+can be found in each tab for the following plots and tables:</p>
+<ul>
+<li><p>Pairwise scatterplots</p></li>
+<li><p>Predictor variable histograms</p></li>
+<li><p>Response variable histograms</p></li>
+<li><p>Spearman rank correlation coefficients between predictors and
+response variables</p></li>
+</ul>
+</div>
+</div>
+<div id="column-5" class="section level2 tabset" data-width="625">
+<h2 class="tabset">Column</h2>
+<div id="scatterplots" class="section level3">
+<h3>Scatterplots</h3>
+<div id="discussion" class="section level4">
+<h4>Discussion</h4>
+<p>The pairwise scatterplot shows scatterplots for all predictor and
+response variables. There are no linear relationships between variables
+except for:</p>
+<ul>
+<li><p>Heat load and cool load</p></li>
+<li><p>Relative compactness and surface area</p></li>
+</ul>
+<p>Since heat load and cool load are not used as predictors of one
+another, this relationship is not very useful. This supports the claim
+made by the original work: classical regression may be insufficient for
+modeling the complex relationships in this data.</p>
+<div class="knitr-options" data-fig-width="1152" data-fig-height="552">
+
+</div>
+<p><img src="index_files/figure-html/scatter-plots-1.png" width="1152" data-figure-id=fig2 style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="predictor-histograms" class="section level3">
+<h3>Predictor Histograms</h3>
+<div id="discussion-1" class="section level4">
+<h4>Discussion</h4>
+<p>The predictor histograms show the following distributions found in
+the data:</p>
+<ul>
+<li><p>Discretely uniformly distributed: orientation, relative
+compactness, and surface area</p></li>
+<li><p>Piecewise uniform: glazing area and glazing area
+distribution</p></li>
+<li><p>Left-skewed: Roof area</p></li>
+<li><p>Normal: wall area</p></li>
+</ul>
+<p>These distributions are intentional and to be expected due to the
+discrete nature of the data and the constraints around the simulated
+buildings discussed earlier.Note that there is no histogram shown for
+overall height. This is due to the discreteness of the data. There are
+only two possible values for this predictor: 3.5 and 7 meters.</p>
+<div class="knitr-options" data-fig-width="1152" data-fig-height="483">
+
+</div>
+<p><img src="index_files/figure-html/predictor-histograms-1.png" width="1152" data-figure-id=fig3 style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="response-histograms" class="section level3">
+<h3>Response Histograms</h3>
+<div id="discussion-2" class="section level4">
+<h4>Discussion</h4>
+<p>The response histograms show the following distribution found in the
+data:</p>
+<ul>
+<li>Bimodal distribution: heat load and cool load</li>
+</ul>
+<p>By design, there is more continuity in the distributions of both
+response variables. There appears to be a slight imbalance in both
+variables, though this could partially be attributed to the size of the
+histogram bins.</p>
+<div class="knitr-options" data-fig-width="1152" data-fig-height="599">
+
+</div>
+<p><img src="index_files/figure-html/response-histograms-1.png" width="1152" data-figure-id=fig4 style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="spearman-correlation-analysis" class="section level3">
+<h3>Spearman Correlation Analysis</h3>
+<div id="discussion-3" class="section level4">
+<h4>Discussion</h4>
+<p>Based on the Spearman rank correlation table, the following
+predictors have the strongest monotonic relationship with heating load,
+whether proportional or not:</p>
+<ul>
+<li><p>Overall height = 0.861 (proportional)</p></li>
+<li><p>Roof area = -0.804 (inversely proportional)</p></li>
+<li><p>Relative compactness = 0.622 (proportional)</p></li>
+<li><p>Surface area = -0.622 (inversely proportional)</p></li>
+<li><p>Wall area = 0.471 (proportional)</p></li>
+</ul>
+<p>Perhaps unsurprisingly, the same relationships hold true for cooling
+load as well.</p>
+<div class="knitr-options" data-fig-width="576" data-fig-height="460">
+
+</div>
+<table style="width:99%;">
+<colgroup>
+<col width="25%" />
+<col width="36%" />
+<col width="36%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Predictor</th>
+<th>Correlation Coefficient with Heat Load</th>
+<th>Correlation Coefficient with Cool Load</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Relative compactness</td>
+<td>0.622</td>
+<td>0.651</td>
+</tr>
+<tr class="even">
+<td>Surface area</td>
+<td>-0.622</td>
+<td>-0.651</td>
+</tr>
+<tr class="odd">
+<td>Wall area</td>
+<td>0.471</td>
+<td>0.416</td>
+</tr>
+<tr class="even">
+<td>Roof area</td>
+<td>-0.804</td>
+<td>-0.803</td>
+</tr>
+<tr class="odd">
+<td>Overall height</td>
+<td>0.861</td>
+<td>0.865</td>
+</tr>
+<tr class="even">
+<td>Orientation</td>
+<td>-0.004</td>
+<td>0.018</td>
+</tr>
+<tr class="odd">
+<td>Glazing area</td>
+<td>0.323</td>
+<td>0.289</td>
+</tr>
+<tr class="even">
+<td>Glazing area distribution</td>
+<td>0.068</td>
+<td>0.046</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div id="model-selection" class="section level1">
+<h1>Model Selection</h1>
+<div id="column-6" class="section level2" data-width="300">
+<h2>Column</h2>
+<div id="procedure" class="section level3">
+<h3>Procedure</h3>
+<p>Model selection is an important step in classical regression analysis
+that aims to balance the trade-off between complexity and
+goodness-of-fit. This process makes sure the model captures real
+underlying patterns without overfitting. It is crucial for identifying a
+subset of variables, aiming to eliminate multicollinearity and obtain a
+model that is both interpretable and can generalize to new data.</p>
+<p>To find the optimal set of predictors to use for modeling heating and
+cooling loads, four selection processes are used:</p>
+<ul>
+<li><p>Forward Selection</p></li>
+<li><p>Backward Selection</p></li>
+<li><p>Stepwise Selection</p></li>
+<li><p>Best Subset Selection</p></li>
+</ul>
+<p>These processes are used for determining the best combination of
+variables for the heating and cooling load models. In theory, we can end
+up with four different models to choose from.</p>
+<p>To make a final selection, we choose the model with the largest
+adjusted <span class="math inline">\(R^2\)</span> (similar to the best
+subset selection process) and/or the lowest root mean square error
+(RMSE). We use a significance level of <span
+class="math inline">\(\alpha = 0.01\)</span>, the same as the original
+work. Model summary tables show the coefficient estimates and their
+significance level.</p>
+</div>
+</div>
+<div id="column-7" class="section level2 tabset" data-width="700">
+<h2 class="tabset">Column</h2>
+<div id="heat-load-models" class="section level3">
+<h3>Heat Load Models</h3>
+<p>For the heating load model, the backward, stepwise, and best subset
+selection processes produced the same model. The forward selection
+process provided a model with an additional predictor, very slightly
+reducing its adjusted <span class="math inline">\(R^2\)</span>. For that
+reason, we go with the model selected from the other three process. The
+predictors that will be used for modeling heating load are:</p>
+<ul>
+<li><p>Relative compactness</p></li>
+<li><p>Surface area</p></li>
+<li><p>Wall area</p></li>
+<li><p>Overall height</p></li>
+<li><p>Glazing area</p></li>
+<li><p>Glazing area distribution</p></li>
+</ul>
+<div class="knitr-options" data-fig-width="576" data-fig-height="460">
+
+</div>
+<table style="width:97%;">
+<caption>Heat Load Model Regression Results</caption>
+<colgroup>
+<col width="24%" />
+<col width="18%" />
+<col width="19%" />
+<col width="19%" />
+<col width="15%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Forward Selection</th>
+<th>Backward Selection</th>
+<th>Stepwise Selection</th>
+<th>Best Subset</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>(Intercept)</strong></td>
+<td><strong>84.013</strong>***</td>
+<td><strong>83.932</strong>***</td>
+<td><strong>83.932</strong>***</td>
+<td><strong>83.932</strong>***</td>
+</tr>
+<tr class="even">
+<td><strong>relative_compactness</strong></td>
+<td><strong>-64.773</strong>***</td>
+<td><strong>-64.773</strong>***</td>
+<td><strong>-64.773</strong>***</td>
+<td><strong>-64.773</strong>***</td>
+</tr>
+<tr class="odd">
+<td><strong>surface_area</strong></td>
+<td><strong>-0.087</strong>***</td>
+<td><strong>-0.087</strong>***</td>
+<td><strong>-0.087</strong>***</td>
+<td><strong>-0.087</strong>***</td>
+</tr>
+<tr class="even">
+<td><strong>wall_area</strong></td>
+<td><strong>0.061</strong>***</td>
+<td><strong>0.061</strong>***</td>
+<td><strong>0.061</strong>***</td>
+<td><strong>0.061</strong>***</td>
+</tr>
+<tr class="odd">
+<td><strong>overall_height</strong></td>
+<td><strong>4.170</strong>***</td>
+<td><strong>4.170</strong>***</td>
+<td><strong>4.170</strong>***</td>
+<td><strong>4.170</strong>***</td>
+</tr>
+<tr class="even">
+<td><strong>orientation</strong></td>
+<td><strong>-0.023</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>glazing_area</strong></td>
+<td><strong>19.933</strong>***</td>
+<td><strong>19.933</strong>***</td>
+<td><strong>19.933</strong>***</td>
+<td><strong>19.933</strong>***</td>
+</tr>
+<tr class="even">
+<td><strong>glazing_area_dist</strong></td>
+<td><strong>0.204</strong>**</td>
+<td><strong>0.204</strong>**</td>
+<td><strong>0.204</strong>**</td>
+<td><strong>0.204</strong>**</td>
+</tr>
+<tr class="odd">
+<td><strong>R2</strong></td>
+<td><strong>0.916</strong></td>
+<td><strong>0.916</strong></td>
+<td><strong>0.916</strong></td>
+<td><strong>0.916</strong></td>
+</tr>
+<tr class="even">
+<td><strong>R2 Adj.</strong></td>
+<td><strong>0.915</strong></td>
+<td><strong>0.916</strong></td>
+<td><strong>0.916</strong></td>
+<td><strong>0.916</strong></td>
+</tr>
+<tr class="odd">
+<td><strong>Num.Obs.</strong></td>
+<td><strong>768</strong></td>
+<td><strong>768</strong></td>
+<td><strong>768</strong></td>
+<td><strong>768</strong></td>
+</tr>
+<tr class="even">
+<td><strong>RMSE</strong></td>
+<td><strong>2.92</strong></td>
+<td><strong>2.92</strong></td>
+<td><strong>2.92</strong></td>
+<td><strong>2.92</strong></td>
+</tr>
+</tbody><tfoot>
+<tr class="odd">
+<td colspan="5"><ul>
+<li>p &lt; 0.1, * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001</li>
+</ul></td>
+</tr>
+</tfoot>
+
+</table>
+</div>
+<div id="cool-load-models" class="section level3">
+<h3>Cool Load Models</h3>
+<p>For the cooling load model, all four processes resulted in nearly
+identical adjusted <span class="math inline">\(R^2\)</span> values. The
+forward selection model produced a very slightly reduced RMSE at the
+expense of including an additional predictor. We choose the less complex
+model that achieves nearly identical performance. The predictors that
+will be used for modeling cooling load are:</p>
+<ul>
+<li><p>Relative compactness</p></li>
+<li><p>Surface area</p></li>
+<li><p>Wall area</p></li>
+<li><p>Overall height</p></li>
+<li><p>Glazing area</p></li>
+</ul>
+<p>These are the same predictors used as the heating load model, minus
+glazing area distribution.</p>
+<div class="knitr-options" data-fig-width="576" data-fig-height="460">
+
+</div>
+<table style="width:97%;">
+<caption>Cool Load Model Regression Results</caption>
+<colgroup>
+<col width="24%" />
+<col width="18%" />
+<col width="19%" />
+<col width="19%" />
+<col width="15%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Forward Selection</th>
+<th>Backward Selection</th>
+<th>Stepwise Selection</th>
+<th>Best Subset</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>(Intercept)</strong></td>
+<td><strong>97.246</strong>***</td>
+<td><strong>97.762</strong>***</td>
+<td><strong>97.762</strong>***</td>
+<td><strong>97.337</strong>***</td>
+</tr>
+<tr class="even">
+<td><strong>relative_compactness</strong></td>
+<td><strong>-70.788</strong>***</td>
+<td><strong>-70.788</strong>***</td>
+<td><strong>-70.788</strong>***</td>
+<td><strong>-70.788</strong>***</td>
+</tr>
+<tr class="odd">
+<td><strong>surface_area</strong></td>
+<td><strong>-0.088</strong>***</td>
+<td><strong>-0.088</strong>***</td>
+<td><strong>-0.088</strong>***</td>
+<td><strong>-0.088</strong>***</td>
+</tr>
+<tr class="even">
+<td><strong>wall_area</strong></td>
+<td><strong>0.045</strong>***</td>
+<td><strong>0.045</strong>***</td>
+<td><strong>0.045</strong>***</td>
+<td><strong>0.045</strong>***</td>
+</tr>
+<tr class="odd">
+<td><strong>overall_height</strong></td>
+<td><strong>4.284</strong>***</td>
+<td><strong>4.284</strong>***</td>
+<td><strong>4.284</strong>***</td>
+<td><strong>4.284</strong>***</td>
+</tr>
+<tr class="even">
+<td><strong>orientation</strong></td>
+<td><strong>0.122</strong></td>
+<td></td>
+<td></td>
+<td><strong>0.122</strong></td>
+</tr>
+<tr class="odd">
+<td><strong>glazing_area</strong></td>
+<td><strong>14.717</strong>***</td>
+<td><strong>14.818</strong>***</td>
+<td><strong>14.818</strong>***</td>
+<td><strong>14.818</strong>***</td>
+</tr>
+<tr class="even">
+<td><strong>glazing_area_dist</strong></td>
+<td><strong>0.041</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>R2</strong></td>
+<td><strong>0.888</strong></td>
+<td><strong>0.888</strong></td>
+<td><strong>0.888</strong></td>
+<td><strong>0.888</strong></td>
+</tr>
+<tr class="even">
+<td><strong>R2 Adj.</strong></td>
+<td><strong>0.887</strong></td>
+<td><strong>0.887</strong></td>
+<td><strong>0.887</strong></td>
+<td><strong>0.887</strong></td>
+</tr>
+<tr class="odd">
+<td><strong>Num.Obs.</strong></td>
+<td><strong>768</strong></td>
+<td><strong>768</strong></td>
+<td><strong>768</strong></td>
+<td><strong>768</strong></td>
+</tr>
+<tr class="even">
+<td><strong>RMSE</strong></td>
+<td><strong>3.18</strong></td>
+<td><strong>3.19</strong></td>
+<td><strong>3.19</strong></td>
+<td><strong>3.19</strong></td>
+</tr>
+</tbody><tfoot>
+<tr class="odd">
+<td colspan="5"><ul>
+<li>p &lt; 0.1, * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001</li>
+</ul></td>
+</tr>
+</tfoot>
+
+</table>
+</div>
+</div>
+</div>
+<div id="model-analysis" class="section level1">
+<h1>Model Analysis</h1>
+<div id="column-8" class="section level2" data-width="500">
+<h2>Column</h2>
+<div id="cross-validation-procedure" class="section level3">
+<h3>Cross-Validation Procedure</h3>
+<p>After model selection, the K-fold cross-validation (CV) experiment is
+conducted. We choose to standardize the predictors in order to assess
+the influence of each predictor on the response variables on the same
+scale. We use the same experiment parameters as the original work:</p>
+<ul>
+<li><p><span class="math inline">\(K = 10\)</span></p></li>
+<li><p>Repetitions = 100</p></li>
+</ul>
+<p>This means that the dataset is split into <span
+class="math inline">\(K = 10\)</span> equally (or nearly equally) sized
+“folds.” For training the model, 9 of the 10 folds are used, while 1
+fold is set aside for testing. This is done to test model
+generalization. Each fold is used once for testing, meaning the model is
+trained 10 separate times on different combinations of folds. This is
+one “repetition” of the process.</p>
+<p>We perform 100 repetitions using 10-fold CV. The dataset is randomly
+shuffled at the beginning of each repetition so that unique folds are
+created for each repetition. After testing every test fold, the MAE,
+MSE, and MRE metrics are computed for the trained model.</p>
+</div>
+<div id="error-metrics" class="section level3">
+<h3>Error Metrics</h3>
+<p>To compare the MLR models to the original work, we use MAE, MSE, and
+MRE, defined as:</p>
+<ul>
+<li><p><span class="math inline">\(MAE = \dfrac{1}{S} \Sigma_{i \epsilon
+Q} |y_i - \hat{y}_i|\)</span>,</p></li>
+<li><p><span class="math inline">\(MSE = \dfrac{1}{S} \Sigma_{i \epsilon
+Q} |y_i - \hat{y}_i|^2\)</span>,</p></li>
+<li><p><span class="math inline">\(MRE = \dfrac{100}{S} \Sigma_{i
+\epsilon Q} \dfrac{|y_i - \hat{y}_i|}{y_i}\)</span>,</p></li>
+</ul>
+<p>where <span class="math inline">\(\hat{y}_i\)</span> is the predicted
+output variable, <span class="math inline">\(y_i\)</span> is the actual
+output variable for the <span class="math inline">\(i^{th}\)</span>
+entry in the test fold, <span class="math inline">\(S\)</span> is the
+number of samples in the test fold, and <span
+class="math inline">\(Q\)</span> contains the indices of the test fold.
+Each repetition results in 10 independent error measurements.</p>
+<p>We end up with 1000 independent error measurements given <span
+class="math inline">\(K = 10\)</span> and 100 repetitions. The reported
+MAE, MSE, and MRE values are the average values of all the measurements,
+plus or minus one standard deviation. The reported errors for the IRLS
+and RF models come directly from the original work <span
+class="citation">(Tsanas and Xifara 2012)</span>.</p>
+<div class="knitr-options" data-fig-width="576" data-fig-height="460">
+
+</div>
+</div>
+</div>
+<div id="column-9" class="section level2 tabset" data-width="500">
+<h2 class="tabset">Column</h2>
+<div id="heating-load-model-results" class="section level3">
+<h3>Heating Load Model Results</h3>
+<p>Heating load model error metrics show the following MAE, MSE, and MRE
+results:</p>
+<ul>
+<li><p><span class="math inline">\(MAE: RF &lt; MLR &lt;
+IRLS\)</span></p></li>
+<li><p><span class="math inline">\(MSE: RF &lt; MLR &lt;
+IRLS\)</span></p></li>
+<li><p><span class="math inline">\(MRE: RF &lt; MLR &lt;
+IRLS\)</span></p></li>
+</ul>
+<p>The RF heating load model significantly outperforms the MLR and IRLS
+models in every metric. The MLR model outperforms the IRLS model in
+every metric. These results back up the claim made in the original work:
+the relationships between the variables are too complicated to be
+captured with classical regression analysis.</p>
+<div class="knitr-options" data-fig-width="576" data-fig-height="460">
+
+</div>
+<div class="knitr-options" data-fig-width="576" data-fig-height="460">
+
+</div>
+<table style="width:72%;">
+<colgroup>
+<col width="12%" />
+<col width="19%" />
+<col width="20%" />
+<col width="19%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th colspan="3">Model MAE, MSE, and MRE</th>
+</tr>
+<tr class="even">
+<th>Metric</th>
+<th>MLR</th>
+<th>IRLS</th>
+<th>RF</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>MAE</td>
+<td>2.09 ± 0.21</td>
+<td>2.14 ± 0.24</td>
+<td>0.51 ± 0.11</td>
+</tr>
+<tr class="even">
+<td>MSE</td>
+<td>8.66 ± 1.58</td>
+<td>9.87 ± 2.41</td>
+<td>1.03 ± 0.54</td>
+</tr>
+<tr class="odd">
+<td>MRE</td>
+<td>9.84 ± 0.89</td>
+<td>10.09 ± 1.01</td>
+<td>2.18 ± 0.64</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="cooling-load-model-results" class="section level3">
+<h3>Cooling Load Model Results</h3>
+<p>Cooling load model error metrics show the following MAE, MSE, and MRE
+results:</p>
+<ul>
+<li><p><span class="math inline">\(MAE: RF &lt; IRLS &lt;
+MLR\)</span></p></li>
+<li><p><span class="math inline">\(MSE: RF &lt; MLR &lt;
+IRLS\)</span></p></li>
+<li><p><span class="math inline">\(MRE: RF &lt; MLR &lt;
+IRLS\)</span></p></li>
+</ul>
+<p>Like the heating model results, the RF model significantly
+outperforms the MLR and IRLS models in every metric. However, between
+the MLR and IRLS models, there is a slight but notable difference in the
+results for the cooling model.</p>
+<p>While the IRLS model achieves a slightly lower average MAE than the
+MLR model, it has a larger average MSE. This is an interesting result
+because of how errors are treated in each metric. MAE treats all errors
+linearly, while MSE penalizes larger errors due to squaring the residual
+value. This indicates that the MLR model has less extreme errors despite
+having a higher average error, making it more robust to outliers and new
+data. This clearly shows that properly selecting predictors outperforms
+simple learning methods meant to handle noise and outliers.</p>
+<p>The cooling model results further verify the claim that for this
+dataset, RF is a superior method to MLR and IRLS for regression modeling
+and analysis. It is much more capable of capturing the non-linear
+relationships between variables.</p>
+<div class="knitr-options" data-fig-width="576" data-fig-height="460">
+
+</div>
+<table style="width:74%;">
+<colgroup>
+<col width="12%" />
+<col width="20%" />
+<col width="20%" />
+<col width="19%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th colspan="3">Model MAE, MSE, and MRE</th>
+</tr>
+<tr class="even">
+<th>Metric</th>
+<th>MLR</th>
+<th>IRLS</th>
+<th>RF</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>MAE</td>
+<td>2.26 ± 0.23</td>
+<td>2.21 ± 0.28</td>
+<td>1.42 ± 0.25</td>
+</tr>
+<tr class="even">
+<td>MSE</td>
+<td>10.30 ± 2.26</td>
+<td>11.46 ± 3.63</td>
+<td>6.59 ± 1.56</td>
+</tr>
+<tr class="odd">
+<td>MRE</td>
+<td>8.99 ± 0.74</td>
+<td>9.41 ± 0.80</td>
+<td>4.62 ± 0.70</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="importance-of-variables" class="section level3">
+<h3>Importance of Variables</h3>
+<p>The table shows the importance of each predictor for a given response
+variable determined via RF. For the MLR model, the “importance” is the
+magnitude of the standardized coefficients. For a better understanding
+of how RF determines variable importance, we recommend reviewing the
+literature <span class="citation">(Strobl et al. 2007)</span>.</p>
+<p>For both models, a larger magnitude for a given predictor indicates a
+larger impact on the response variable. The values for each model are
+not on the same scale. The ranking of variable importance is denoted in
+the parenthesis next to each variables importance value, where 1 is the
+most important.</p>
+<p>The heating and cooling load RF models have similar orders of
+importance, but the cooling load model found glazing area distribution
+and orientation to be more important than its heating load counterpart.
+The heating and cooling load MLR models have the same order of
+importance for the predictors they have in common.</p>
+<p>The heating load model has glazing area distribution area as an
+additional predictor, but it has the smallest magnitude of all the
+standardized coefficients. Interestingly, the RF model found that roof
+area and orientation were two of the least important predictors in both
+models, both of which were removed as predictors from the MLR
+models.</p>
+<p>The MLR cooling load model also removed glazing area distribution as
+a predictor, which the RF cooling load model found to have moderate
+relative importance. However, both RF models found glazing area to be
+the most important predictor, while both MLR models found it to be one
+of the least important variables used.</p>
+<p>The MLR models also significantly overvalued overall height as a
+predictor in both models. Both RF models found it to be the least
+important variable. These results point to the same conclusion from the
+original work: classical regression analysis is not capable of capturing
+the complex, non-linear relationships in this dataset.</p>
+<div class="knitr-options" data-fig-width="576" data-fig-height="460">
+
+</div>
+<table style="width:97%;">
+<colgroup>
+<col width="23%" />
+<col width="19%" />
+<col width="18%" />
+<col width="19%" />
+<col width="18%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Measure</th>
+<th>RF - Heating</th>
+<th>MLR - Heating</th>
+<th>RF - Cooling</th>
+<th>MLR - Cooling</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>relative_compactness</td>
+<td>50.51 ± 1.15 (2)</td>
+<td>6.85 ± 0.23 (3)</td>
+<td>43.74 ± 1.11 (2)</td>
+<td>7.49 ± 0.26 (3)</td>
+</tr>
+<tr class="even">
+<td>surface_area</td>
+<td>50.41 ± 1.41 (3)</td>
+<td>7.69 ± 0.32 (1)</td>
+<td>43.55 ± 1.08 (3)</td>
+<td>7.78 ± 0.36 (1)</td>
+</tr>
+<tr class="odd">
+<td>wall_area</td>
+<td>40.16 ± 1.09 (4)</td>
+<td>2.65 ± 0.09 (5)</td>
+<td>32.16 ± 0.83 (5)</td>
+<td>1.95 ± 0.09 (5)</td>
+</tr>
+<tr class="even">
+<td>roof_area</td>
+<td>20.40 ± 0.95 (6)</td>
+<td>NA</td>
+<td>20.12 ± 0.87 (7)</td>
+<td>NA</td>
+</tr>
+<tr class="odd">
+<td>overall_height</td>
+<td>8.97 ± 0.68 (8)</td>
+<td>7.30 ± 0.19 (2)</td>
+<td>9.41 ± 0.72 (8)</td>
+<td>7.50 ± 0.22 (2)</td>
+</tr>
+<tr class="even">
+<td>orientation</td>
+<td>18.51 ± 0.44 (7)</td>
+<td>NA</td>
+<td>22.03 ± 0.48 (6)</td>
+<td>NA</td>
+</tr>
+<tr class="odd">
+<td>glazing_area</td>
+<td>93.12 ± 1.50 (1)</td>
+<td>2.66 ± 0.04 (4)</td>
+<td>86.92 ± 1.58 (1)</td>
+<td>1.97 ± 0.04 (4)</td>
+</tr>
+<tr class="even">
+<td>glazing_are_dist</td>
+<td>38.84 ± 0.94 (5)</td>
+<td>0.32 ± 0.04 (6)</td>
+<td>39.07 ± 0.97 (4)</td>
+<td>NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="summary" class="section level1">
+<h1>Summary</h1>
+<div id="column-10" class="section level2" data-width="650">
+<h2>Column</h2>
+<div id="final-model-interpretations" class="section level3"
+data-height="300">
+<h3>Final Model Interpretations</h3>
+<p>Given the final MLR heating and cooling load estimated standardized
+coefficients, the estimated models can be written as follows:</p>
+<ul>
+<li><p><span class="math inline">\(\hat{Heat \space Load} =
+6.85(\textit{relative compactness}) + 7.69(\textit{surface area}) +
+2.65(\textit{wall area}) + 7.30(\textit{overall height}) +
+2.66(\textit{glazing area}) + 0.32(\textit{glazing area
+distribution})\)</span></p></li>
+<li><p><span class="math inline">\(\hat{Cool \space Load} =
+7.49(\textit{relative compactness}) + 7.78(\textit{surface area}) +
+1.95(\textit{wall area}) + 7.50(\textit{overall height}) +
+1.97(\textit{glazing area})\)</span></p></li>
+</ul>
+<p>Since only the predictors were standardized, interpretation is as
+follows, within model context. Relative compactness from the heating
+load model is used here as an example: for every one-standard-deviation
+change in relative compactness, the expected change in heat load is 6.85
+units, holding all other variables constant.</p>
+</div>
+<div id="conclusion" class="section level3" data-height="700">
+<h3>Conclusion</h3>
+<p>In this project, we perform 10-fold CV of a publicly available
+dataset from simulated EPB data. Previous work <span
+class="citation">(Tsanas and Xifara 2012)</span> explored the use of
+IRLS and RF to model heating and cooling loads given 8 predictors,
+claiming that classical regression analysis was insufficient for
+capturing the complex nature of the relationships between variables.
+This work explored that claim by going through a model selection process
+that removed insignificant predictors from the heating and cooling load
+models when using the full dataset. 10-fold CV testing was conducted 100
+times to replicate the experiment in the original work, providing MAE,
+MSE, and MRE metrics for direct comparison to the published IRLS and RF
+results.</p>
+<p>We found that while RF was superior to the MLR models in this work,
+proper variable selection for the MLR models actually resulted in better
+performance than the IRLS models. Since IRLS is designed specifically
+for optimizing regression model coefficients and to handle outliers,
+this is a significant result. It shows that while RF is still superior
+for better capturing highly non-linear relationships, finely selecting
+the best predictors for classical regression analysis is better than
+simply using all variables and using IRLS in an attempt to optimize the
+model.</p>
+<p>It is important to note that all of the results from this project,
+and the published work, is unlikely to generalize well in the real
+world. The size of the dataset alone (768 observations) is not enough to
+generalize to cities, nations, or the world. In addition, all of the
+buildings in this <span
+class="math inline">\(\textit{simulated}\)</span> dataset had very
+specific constraints, including:</p>
+<ul>
+<li><p>Identical build quality and materials</p></li>
+<li><p>Same number of residents per building (7)</p></li>
+<li><p>All buildings were located in Athens, Greece</p></li>
+<li><p>All buildings used a fixed activity rate of 70 Watts</p></li>
+</ul>
+<p>However, the dataset is sufficient for comparing estimated models
+using different methods. This is important when it comes to real-world
+data, as the results from this work, the published work, and any prior
+work, guide intuitions and decisions made when it comes to real-world
+analysis.</p>
+</div>
+</div>
+<div id="column-11" class="section level2" data-width="350">
+<h2>Column</h2>
+<div id="author-information" class="section level3">
+<h3>Author Information</h3>
+<p>Eric Smith is a PhD student in the department of Electrical and
+Computer Engineering at the University of Dayton. He holds a B.S. in
+Physics from the Ohio State University and M.S. in Electro-Optics from
+the University of Dayton. He works full-time for a small defense
+contractor in Beavercreek, Ohio, specializing in directed energy and
+atmospheric simulation, modeling, and measurement. His research
+interests broadly include computer vision problems involving object
+detection and tracking, with his most recent work focused on a modular
+algorithm for small drone detection and tracking.</p>
+</div>
+<div id="references" class="section level3">
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body" entry-spacing="0">
+<div id="ref-bishop2006pattern" class="csl-entry">
+Bishop, C.M., Nasrabadi, N.M.: Pattern recognition and machine learning.
+Springer (2006)
+</div>
+<div id="ref-strobl2007bias" class="csl-entry">
+Strobl, C., Boulesteix, A.-L., Zeileis, A., Hothorn, T.: Bias in random
+forest variable importance measures: Illustrations, sources and a
+solution. BMC bioinformatics. 8, 25 (2007)
+</div>
+<div id="ref-tsanas2009accurate" class="csl-entry">
+Tsanas, A., Little, M., McSharry, P., Ramig, L.: Accurate telemonitoring
+of parkinson’s disease progression by non-invasive speech tests. Nature
+Precedings. 1–1 (2009)
+</div>
+<div id="ref-tsanas2012accurate" class="csl-entry">
+Tsanas, A., Xifara, A.: Accurate quantitative estimation of energy
+performance of residential buildings using statistical machine learning
+tools. Energy and buildings. 49, 560–567 (2012)
+</div>
+</div>
+</div>
+<div id="disclaimers" class="section level3">
+<h3>Disclaimers</h3>
+<p>ChatGPT, Google AI Overview, and Google Gemini were used to help with
+general code problems, like syntax, as well as determining necessary
+libraries and how to use their functions in R. Google Gemini was used to
+generate the IRLS flowchart and RF illustration in Figures <a
+href="#IRLS-Flowchart">2</a> and <a href="#RF-illustration">3</a>,
+respectively.</p>
+</div>
+</div>
+</div>
+
+</div>
+
+<script>
+$(document).ready(function() {
+  // add bootstrap table styles to pandoc tables
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed table-sm');
+
+  // initialize mathjax
+  var script = document.createElement("script");
+  script.type = "text/javascript";
+  script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+  document.getElementsByTagName("head")[0].appendChild(script);
+
+});
+</script>
+
+<div id="flexdashboard-source-code">
+<pre class="line-numbers"><code class="language-r">---
+# title: 'MTH 543: Final Project'
+title: 'Energy Performance Estimation'
+author: "Eric Smith"
+# date: "`r Sys.Date()`"
+output: 
+  flexdashboard::flex_dashboard:
+    theme:
+      version: 4 # preferred over v5
+      # version: 5
+      # bootswatch: cosmo
+      bootswatch: darkly # theme
+      navbar-bg: "purple"
+    orientation: columns
+    vertical_layout: fill
+    # vertical_layout: scroll
+    source_code: embed
+bibliography: references.bib
+csl: asta-advances-in-statistical-analysis.csl
+---
+
+&lt;style&gt;
+.chart-title {  /* chart_title  */
+   font-size: 16px;
+  }
+body{ /* Normal  */
+      font-size: 14px;
+  }
+&lt;/style&gt;
+
+&lt;head&gt;
+  &lt;base target="_blank"&gt;
+&lt;/head&gt;
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(flexdashboard)
+```
+
+Project Overview
+===
+
+Column {data-width=650}
+---
+
+### Goal {data-height=35}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+rm(list = ls()) # clears global workspace to start fresh
+library(pacman)
+pacman::p_load(rstudioapi, DataExplorer, modelsummary, readxl, caret,
+               corrplot, MASS, leaps, tidymodels, tinytable, dplyr, gt, tibble)
+
+# Set the working directory to this files location
+# script_path &lt;- rstudioapi::getActiveDocumentContext()$path
+# script_dir &lt;- dirname(script_path)
+# setwd(script_dir)
+setwd("E:/School/PhD/Classes/MTH543/FinalProject/MTH-543-Final-Project")
+```
+In this final project, we perform regression analysis using building specifications to estimate energy performance of buildings (EPB), specifically heat load and cool load. The dataset used in this work is a publicaly available simulated dataset found in the UC Irvine Machine Learning Repository ([dataset link](https://archive.ics.uci.edu/dataset/242/energy+efficiency)). In this particular dataset, there are 12 different building shapes, differing with respect to the glazing area, glazing area distribution, and orientation, as well as some other variables.
+
+### Dataset Overview {data-height=30}
+In total, there are 768 observations (buildings). There are 8 predictor variables and 2 response variables. Figure [1](#intro-plot) shows a basic summary of the full dataset. From this plot, we find that the entire dataset is clean with no missing data. This is a simulated dataset that was created to investigate the effect of eight input variables on determining two output variables. The "Dataset Variables" table shows the variable names and number of possible values.
+
+
+### Simulated Building Information {data-height=70}
+There are 12 simulated building forms in total, composed of 18 "elements." The following assumptions are made for all buildings:
+
+* Location and occupants: Residential building in Athens, Greece, with 7 residents
+
+* Fixed activity of 70 Watts
+
+* All internal and thermal properties are the same
+
+* $(12 \text{ building forms } \times 3 \text{ glazing area variations } \times 5 \text{ glazing area distributions } \times 4 \text{ orientations }) + (12 \text{ building forms } \times 4 \text{ orientations w/o glazing}) = 768 \text{ buildings}$
+
+### Project Focus {data-height=90}
+This project focuses on a specific claim made in the original work: classical regression analysis is insufficient for modeling with this dataset, hence favoring IRLS and RF. This final project aims to verify the claim. The end goal is to determine if the claim is true, and if so, how much better is IRLS and RF than classical regression analysis and modeling? This will be done by comparing the provided mean absolute error (MAE), mean square error (MSE), and mean relative error (MRE) values in the original work and comparing it with those found in this project. 
+
+The first step is perform exploratory data analysis (EDA). Then, the best set of variables to use for modeling heating and cooling loads will be found using several processes. This will be done using the entire dataset. Once the variables for each model have been chosen, the same experiment conducted in the original work to determine the  MAE, MSE, and MRE of the IRLS and RF models will be performed. This involves many repetitions of shuffling the dataset, creating training and testing splits, fitting models, and measuring errors. This will be discussed in further detail in the "Model Analysis" section. 
+
+Before EDA, we perform a brief introduction of IRLS and RF to better understand how each works. This is done in the "Background" section.
+
+Column {data-width=350}
+---
+
+### Introduction Plot {data-height=54}
+&lt;!-- Figure 1 --&gt;
+&lt;a name="intro-plot"&gt;&lt;/a&gt;
+```{r intro-plot, echo=FALSE, fig.width=9}
+# Load the data and remove missing data
+df &lt;- read_excel("./data/ENB2012_data.xlsx", na = c("?", "NA"))
+
+# Rename the variables to their defined names
+df &lt;- df %&gt;% rename(relative_compactness = X1, surface_area = X2,
+                    wall_area = X3, roof_area = X4, overall_height = X5,
+                    orientation = X6, glazing_area = X7, glazing_area_dist = X8,
+                    heat_load = Y1, cool_load = Y2)
+
+plot_intro(df) # visualize basic information about the full dataset
+```
+
+### Dataset Variables {data-height=46}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+# Define the variable information
+vars &lt;- c("X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "Y1", "Y2")
+var_names &lt;- c("Relative compactness", "Surface area", "Wall area", "Roof area",
+               "Overall height", "Orientation", "Glazing area", "Glazing area distribution",
+               "Heating load", "Cooling load")
+n_vals &lt;- c(12, 12, 7, 4, 2, 4, 4, 6, 586, 636)
+
+# Create a data frame of variable information
+var_df &lt;- data.frame(
+  Variable = vars,
+  Name = var_names,
+  Vals = n_vals
+)
+
+# Rename column headers
+names(var_df) &lt;- c("Variable", "Variable Names", "Number of Possible Values")
+
+# Create the table
+tt(var_df) %&gt;%
+  # Center align columns
+  style_tt(j = 1:3, align = "c")
+```
+
+Background
+===
+
+Column {data-width=600}
+---
+
+### Overview {data-height=70}
+In the original work [@tsanas2012accurate], statistical machine learning methods are used to train and test models on the dataset to predict heat and cool loads given all predictors. The reason for investigating statistical machine learning for this specific problem is that classical least squares regression techniques is unable to sufficiently model and capture the non-linear nature of the problem. Two methods are explored in the original work: iteratively reweighted least squares (IRLS) and random forest (RF).
+
+In addition, we briefly discuss why Spearman rank correlation is used instead of Pearson correlation.
+
+### Iteratively Reweighted Least Squares (IRLS) {data-height=75}
+IRLS is simpler than RF and is a commonly used regression method. It works by adjusting the weights of a regression models coefficients to reduce the impact of outliers in data. This ultimately leads to an improved least squares estimate and overall model fit. More information on IRLS can be found in literature [@bishop2006pattern; @tsanas2009accurate]. However, in applications where residuals do not follow a Gaussian distribution, IRLS can struggle to sufficiently model complex relationships. For this reason, RF is also used for regression analysis with this dataset.
+
+A basic flowchart of IRLS is shown in Figure [2](#IRLS-flowchart). The flowchart was generated using Google Gemini.
+
+### Random Forst (RF) {data-height=95}
+RF is an extension of the classification and regression tree (CART). CART is a nonlinear method designed for classification and regression analysis. When response variables are categorical, it serves as a classification model. It can also be used to build regression trees when predictors are continuous, numeric values. 
+
+The concept of CART is to repeatedly split an input feature space (predictors) into smaller sub-regions. The feature space is iteratively split into smaller and smaller sub-regions until it is not possible to split it any more, or some criterion to stop splitting has been met. RF is a collection of many "trees," or a collection of CART models. To obtain this collection of models, a random subset of the variables are chosen for each model, and then the CART procedure is performed for each tree.
+
+A simple illustration of RF is shown in Figure [3](#RF-illustration). The illustration was generated using Google Gemini.
+
+### Spearman Rank Correlation {data-height=95}
+Spearman rank correlation is used instead of the Pearson correlation since that is what the original work chose to do. This decision was made because most of the predictors have non-Gaussian distributions and non-linear relationships. This method determines how well the relationship between two variables can be described using a monotonic function.
+
+&lt;!-- This method determines how well the relationship between two variables can be described using a monotonic function, i.e. a function that only ever increases or decreases, but not necessarily at a constant rate. Instead of using the raw data, each variable is converted into a set of ranks. The ranks of two variables are used to determine the correlation coefficient.  --&gt;
+
+The coefficient value is between -1 and 1, where a negative value indicates an inversely proportional relatinship and a positive value indicates a proportional relationship.
+
+Column {data-width=400}
+---
+
+### IRLS Flowchart {data-height=400}
+&lt;!-- Figure 2 --&gt;
+&lt;a name="IRLS-flowchart"&gt;&lt;/a&gt;
+```{r IRLS-flowchart, echo=FALSE, warning=FALSE, message=FALSE}
+knitr::include_graphics("./Figures/IRLS_Flowchart.png")
+```
+
+### RF Illustration {data-height=600}
+&lt;!-- Figure 3 --&gt;
+&lt;a name="RF-illustration"&gt;&lt;/a&gt;
+```{r RF-illustration, echo=FALSE, warning=FALSE, message=FALSE}
+knitr::include_graphics("./Figures/RF_Regression.png")
+```
+
+EDA
+===
+
+Column {data-width=375}
+---
+
+### Investigating the Data
+We begin with EDA of the full dataset. Discussion and conclusions and can be found in each tab for the following plots and tables:
+
+* Pairwise scatterplots
+
+* Predictor variable histograms
+
+* Response variable histograms
+
+* Spearman rank correlation coefficients between predictors and response variables
+
+Column {.tabset data-width=625}
+---
+
+### Scatterplots
+
+#### Discussion
+The pairwise scatterplot shows scatterplots for all predictor and response variables. There are no linear relationships between variables except for:
+
+* Heat load and cool load
+
+* Relative compactness and surface area
+
+Since heat load and cool load are not used as predictors of one another, this relationship is not very useful. This supports the claim made by the original work: classical regression may be insufficient for modeling the complex relationships in this data.
+
+```{r scatter-plots, fig.width=12, fig.height=5.76, fig.align='center', echo=FALSE}
+oldpar &lt;- par(no.readonly = TRUE)
+par(bg = "white")
+pairs(~heat_load + cool_load + relative_compactness + surface_area + wall_area + roof_area +
+        overall_height + orientation + glazing_area + glazing_area_dist, data = df) # Pairwise scatterplots
+par(oldpar)
+```
+
+### Predictor Histograms
+
+#### Discussion
+The predictor histograms show the following distributions found in the data:
+
+* Discretely uniformly distributed: orientation, relative compactness, and surface area
+
+* Piecewise uniform: glazing area and glazing area distribution
+
+* Left-skewed: Roof area
+
+* Normal: wall area
+
+These distributions are intentional and to be expected due to the discrete nature of the data and the constraints around the simulated buildings discussed earlier.Note that there is no histogram shown for overall height. This is due to the discreteness of the data. There are only two possible values for this predictor: 3.5 and 7 meters.
+
+```{r predictor-histograms, fig.width=12, fig.height=5.04, fig.align='center', echo=FALSE}
+plot_histogram(df[, c(1:8)], nrow = 2, ncol = 4) # histograms of predictors
+```
+
+### Response Histograms
+
+#### Discussion
+The response histograms show the following distribution found in the data:
+
+* Bimodal distribution: heat load and cool load
+
+By design, there is more continuity in the distributions of both response variables. There appears to be a slight imbalance in both variables, though this could partially be attributed to the size of the histogram bins.
+
+```{r response-histograms, fig.width=12, fig.height=6.24, fig.align='center', echo=FALSE}
+plot_histogram(df[, c(-1:-8)], nrow = 1, ncol = 2) # histograms of response variables
+```
+
+### Spearman Correlation Analysis
+
+#### Discussion
+Based on the Spearman rank correlation table, the following predictors have the strongest monotonic relationship with heating load, whether proportional or not: 
+
+* Overall height = 0.861 (proportional)
+
+* Roof area = -0.804 (inversely proportional)
+
+* Relative compactness = 0.622 (proportional)
+
+* Surface area = -0.622 (inversely proportional)
+
+* Wall area = 0.471 (proportional)
+
+Perhaps unsurprisingly, the same relationships hold true for cooling load as well.
+
+```{r spearman-plots, echo=FALSE}
+# spearman_cor &lt;- cor(df[, c(1:8)], method = "spearman") # Spearman correlation matrix of predictors
+spearman_cor &lt;- cor(df, method = "spearman") # Spearman correlation matrix of predictors
+heat_cor &lt;- spearman_cor[9, 1:8] # Spearman rank correlation coefficients between predictors and heat load
+cool_cor &lt;- spearman_cor[10, 1:8] # Spearman rank correlation coefficients between predictors and cool load
+
+fmt_cor &lt;- function(val) {
+  sprintf("%1.3f", val)
+}
+
+# Format the correlation coefficients to put into a table
+cor_names &lt;- c("Relative compactness", "Surface area", "Wall area", "Roof area",
+               "Overall height", "Orientation", "Glazing area",
+               "Glazing area distribution")
+heat_cor_tt &lt;- array(data = NA, dim = c(1, length(heat_cor)))
+cool_cor_tt &lt;- array(data = NA, dim = c(1, length(cool_cor)))
+
+for (i in 1:length(heat_cor)) {
+  heat_cor_tt[i] &lt;- fmt_cor(heat_cor[i])
+  cool_cor_tt[i] &lt;- fmt_cor(cool_cor[i])
+}
+
+cor_df &lt;- data.frame(
+  Predictor = cor_names,
+  `Correlation with Heat Load` = as.vector(heat_cor_tt),
+  `Correlation with Cool Load` = as.vector(cool_cor_tt)
+)
+
+names(cor_df) &lt;- c("Predictor", "Correlation Coefficient with Heat Load", "Correlation Coefficient with Cool Load")
+
+tt(cor_df) %&gt;%
+  style_tt(j = 1:3, align = "c")
+```
+
+Model Selection
+===
+
+Column {data-width=300}
+---
+
+### Procedure
+Model selection is an important step in classical regression analysis that aims to balance the trade-off between complexity and goodness-of-fit. This process makes sure the model captures real underlying patterns without overfitting. It is crucial for identifying a subset of variables, aiming to eliminate multicollinearity and obtain a model that is both interpretable and can generalize to new data.
+
+To find the optimal set of predictors to use for modeling heating and cooling loads, four selection processes are used:
+
+* Forward Selection
+
+* Backward Selection
+
+* Stepwise Selection
+
+* Best Subset Selection
+
+These processes are used for determining the best combination of variables for the heating and cooling load models. In theory, we can end up with four different models to choose from. 
+
+To make a final selection, we choose the model with the largest adjusted $R^2$ (similar to the best subset selection process) and/or the lowest root mean square error (RMSE). We use a significance level of $\alpha = 0.01$, the same as the original work. Model summary tables show the coefficient estimates and their significance level.
+
+Column {.tabset data-width=700}
+---
+
+### Heat Load Models
+For the heating load model, the backward, stepwise, and best subset selection processes produced the same model. The forward selection process provided a model with an additional predictor, very slightly reducing its adjusted $R^2$. For that reason, we go with the model selected from the other three process. The predictors that will be used for modeling heating load are:
+
+* Relative compactness
+
+* Surface area
+
+* Wall area
+
+* Overall height
+
+* Glazing area
+
+* Glazing area distribution
+
+```{r heat-forward-model-summary, echo=FALSE, warning=FALSE, message=FALSE}
+# Set the seed for random permutations of data later 
+set.seed(3)
+
+full.heat_model &lt;- lm(heat_load ~ relative_compactness + surface_area + wall_area + roof_area + 
+                        overall_height + orientation + glazing_area + glazing_area_dist, data = df)
+
+full_fit.heat_forward &lt;- stepAIC(full.heat_model, direction = "forward", trace = FALSE) # forward model
+full_fit.heat_backward &lt;- stepAIC(full.heat_model, direction = "backward", trace = FALSE) # backward model
+full_fit.heat_step &lt;- stepAIC(full.heat_model, direction = "both", trace = FALSE) # stepwise model
+
+# Best subset model
+full_fit.heat_subsets &lt;- regsubsets(heat_load ~ relative_compactness + surface_area + wall_area + 
+            overall_height + orientation + glazing_area + glazing_area_dist, data = df, nvmax = 6)
+
+subs_heat_full &lt;- summary(full_fit.heat_subsets)
+subs_sum_heat_full &lt;- summary(subs_heat_full)
+best_size_heat_full &lt;- which.max(subs_heat_full$adjr2)
+best_terms_heat_full &lt;- names(coef(full_fit.heat_subsets, best_size_heat_full))[-1]
+best_formula_heat_full &lt;- as.formula(paste("heat_load ~ ", paste(best_terms_heat_full, collapse = "+")))
+full_fit.heat_best &lt;- lm(best_formula_heat_full, data = df)
+
+ms_heat &lt;- modelsummary(
+  list("Forward Selection" = full_fit.heat_forward, "Backward Selection" = full_fit.heat_backward,
+       "Stepwise Selection" = full_fit.heat_step, "Best Subset" = full_fit.heat_best),
+  statistic = NULL,
+  gof_map = c("r.squared", "adj.r.squared", "nobs", "rmse"),
+  title = "Heat Load Model Regression Results",
+  escape = FALSE,
+  stars = TRUE
+)
+ms_heat %&gt;%
+    style_tt(i = 1:20, j = 1:5, background = "white", color = "white", bold = TRUE)
+```
+
+### Cool Load Models
+For the cooling load model, all four processes resulted in nearly identical adjusted $R^2$ values. The forward selection model produced a very slightly reduced RMSE at the expense of including an additional predictor. We choose the less complex model that achieves nearly identical performance. The predictors that will be used for modeling cooling load are:
+
+* Relative compactness
+
+* Surface area
+
+* Wall area
+
+* Overall height
+
+* Glazing area
+
+These are the same predictors used as the heating load model, minus glazing area distribution.
+
+```{r cool-forward-model-summary, echo=FALSE, warning=FALSE, message=FALSE}
+full.cool_model &lt;- lm(cool_load ~ relative_compactness + surface_area + wall_area + roof_area +
+                        overall_height + orientation + glazing_area + glazing_area_dist, data = df)
+
+full_fit.cool_forward &lt;- stepAIC(full.cool_model, direction = "forward", trace = FALSE) # forward model
+full_fit.cool_backward &lt;- stepAIC(full.cool_model, direction = "backward", trace = FALSE) # backward model
+full_fit.cool_step &lt;- stepAIC(full.cool_model, direction = "both", trace = FALSE) # stepwise model
+
+# Best subset model
+full_fit.cool_subsets &lt;- regsubsets(cool_load ~ relative_compactness + surface_area + wall_area +
+              overall_height + orientation + glazing_area + glazing_area_dist, data = df, nvmax = 6)
+
+subs_cool_full &lt;- summary(full_fit.cool_subsets)
+subs_sum_cool_full &lt;- summary(subs_cool_full)
+best_size_cool_full &lt;- which.max(subs_cool_full$adjr2)
+best_terms_cool_full &lt;- names(coef(full_fit.cool_subsets, best_size_cool_full))[-1]
+best_formula_cool_full &lt;- as.formula(paste("cool_load ~ ", paste(best_terms_cool_full, collapse = "+")))
+full_fit.cool_best &lt;- lm(best_formula_cool_full, data = df)
+
+ms_cool &lt;- modelsummary(
+  list("Forward Selection" = full_fit.cool_forward, "Backward Selection" = full_fit.cool_backward,
+       "Stepwise Selection" = full_fit.cool_step, "Best Subset" = full_fit.cool_best),
+  statistic = NULL,
+  gof_map = c("r.squared", "adj.r.squared", "nobs", "rmse"),
+  title = "Cool Load Model Regression Results",
+  escape = FALSE,
+  stars = TRUE
+)
+ms_cool %&gt;%
+    style_tt(i = 1:20, j = 1:5, background = "white", color = "white", bold = TRUE)
+```
+
+Model Analysis
+===
+
+Column {data-width=500}
+---
+
+### Cross-Validation Procedure
+After model selection, the K-fold cross-validation (CV) experiment is conducted. We choose to standardize the predictors in order to assess the influence of each predictor on the response variables on the same scale. We use the same experiment parameters as the original work:
+
+* $K = 10$
+
+* Repetitions = 100
+
+This means that the dataset is split into $K = 10$ equally (or nearly equally) sized "folds." For training the model, 9 of the 10 folds are used, while 1 fold is set aside for testing. This is done to test model generalization. Each fold is used once for testing, meaning the model is trained 10 separate times on different combinations of folds. This is one "repetition" of the process. 
+
+We perform 100 repetitions using 10-fold CV. The dataset is randomly shuffled at the beginning of each repetition so that unique folds are created for each repetition. After testing every test fold, the MAE, MSE, and MRE metrics are computed for the trained model.
+
+### Error Metrics
+To compare the MLR models to the original work, we use MAE, MSE, and MRE, defined as:
+
+* $MAE = \dfrac{1}{S} \Sigma_{i \epsilon Q} |y_i - \hat{y}_i|$,
+
+* $MSE = \dfrac{1}{S} \Sigma_{i \epsilon Q} |y_i - \hat{y}_i|^2$,
+
+* $MRE = \dfrac{100}{S} \Sigma_{i \epsilon Q} \dfrac{|y_i - \hat{y}_i|}{y_i}$,
+
+where $\hat{y}_i$ is the predicted output variable, $y_i$ is the actual output variable for the $i^{th}$ entry in the test fold, $S$ is the number of samples in the test fold, and $Q$ contains the indices of the test fold. Each repetition results in 10 independent error measurements. 
+
+We end up with 1000 independent error measurements given $K = 10$ and 100 repetitions. The reported MAE, MSE, and MRE values are the average values of all the measurements, plus or minus one standard deviation. The reported errors for the IRLS and RF models come directly from the original work [@tsanas2012accurate].
+
+```{r k-fold-testing, echo=FALSE, warning=FALSE, message=FALSE}
+# Define the number of repetitions and folds
+nRep &lt;- 100
+kFold &lt;- 10
+
+# Create empty vectors for model results found during evaluation
+empty_vecs &lt;- c(1, nRep*kFold) # dimensionality of result vectors
+model_res.heat.MAE &lt;- array(data = NA, dim = empty_vecs)
+model_res.heat.MSE &lt;- array(data = NA, dim = empty_vecs)
+model_res.heat.MRE &lt;- array(data = NA, dim = empty_vecs)
+model_res.cool.MAE &lt;- array(data = NA, dim = empty_vecs)
+model_res.cool.MSE &lt;- array(data = NA, dim = empty_vecs)
+model_res.cool.MRE &lt;- array(data = NA, dim = empty_vecs)
+
+# Create empty vectors for model coefficients obtained during evaluation
+heat_coeff &lt;- tibble(
+  relative_compactness = as.vector(array(data = NA, dim = empty_vecs)),
+  surface_area = as.vector(array(data = NA, dim = empty_vecs)),
+  wall_area = as.vector(array(data = NA, dim = empty_vecs)),
+  overall_height = as.vector(array(data = NA, dim = empty_vecs)),
+  glazing_area = as.vector(array(data = NA, dim = empty_vecs)),
+  glazing_area_dist = as.vector(array(data = NA, dim = empty_vecs))
+)
+
+cool_coeff &lt;- tibble(
+  relative_compactness = as.vector(array(data = NA, dim = empty_vecs)),
+  surface_area = as.vector(array(data = NA, dim = empty_vecs)),
+  wall_area = as.vector(array(data = NA, dim = empty_vecs)),
+  overall_height = as.vector(array(data = NA, dim = empty_vecs)),
+  glazing_area = as.vector(array(data = NA, dim = empty_vecs))
+)
+
+# Define the predictor variables, used later for normalization
+pred_vars &lt;- c("relative_compactness", "surface_area", "wall_area", 
+               "roof_area", "overall_height", "orientation", 
+               "glazing_area", "glazing_area_dist")
+
+# Perform 100 repetitions of 10-fold CV testing with the data
+cc &lt;- 1 # index counter for storing results 
+for (i in 1:nRep) {
+  # At the beginning of each repetition, randomly shuffle the entire dataset
+  df_shuffle &lt;- df[sample(nrow(df)), ]
+  
+  # Create cross-validation (CV) folds using caret --&gt; createFolds function
+  folds.test_idx &lt;- createFolds(y = df_shuffle$heat_load, k = kFold, list = TRUE, returnTrain = FALSE) # test data folds
+  folds.train_idx &lt;- list() # placeholder list for training data folds
+  
+  # Loop through the test folds and get corresponding training folds
+  for (j in 1:length(folds.test_idx)) {
+    field_name &lt;- sprintf("Fold%02d", j) # Current fold name
+    test_indices &lt;- folds.test_idx[[j]] # current folds test indices
+    
+    # Calculate the training indices and set in folds list
+    new_idx &lt;- setdiff(seq_len(nrow(df_shuffle)), test_indices)
+    folds.train_idx[[field_name]] &lt;- new_idx # current folds training indices
+    
+    # Clear loop specific variables
+    suppressWarnings(rm(field_name, test_indices, new_idx))
+  }
+  
+  # Loop through each fold for the current repetition and create a MLR using the predictors pre-determined to be the best
+  # for the heat load and cool load models
+  # Heat model predictors: relative_compactness, surface_area, wall_area, overall_height, glazing_area, glazing_area_dist
+  # Cool model predictors: relative_compactness, surface_area, wall_area, overall_height, glazing_area
+  
+  for (j in 1:length(folds.test_idx)) {
+    test_idx &lt;- folds.test_idx[[j]] # current folds test indices
+    train_idx &lt;- folds.train_idx[[j]] # current folds training indices
+    
+    # Get the raw training and testing data
+    df_train_raw &lt;- df_shuffle[train_idx, ]
+    df_test_raw &lt;- df_shuffle[test_idx, ]
+    
+    # Calculate normalization parameters using training data predictors
+    # norm_params &lt;- preProcess(df_train_raw[, pred_vars], method = c("range")) # normalizes predictors 0-1
+    norm_params &lt;- preProcess(df_train_raw[, pred_vars], method = c("center", "scale")) # standardizes predictors
+    
+    # Normalize predictors based on the current training fold
+    df_train &lt;- predict(norm_params, df_train_raw)
+    df_test  &lt;- predict(norm_params, df_test_raw)
+    
+    # Fit the heat and cool load models using the current training data
+    heat_model &lt;- lm(heat_load ~ relative_compactness + surface_area + wall_area +
+                       overall_height + glazing_area + glazing_area_dist, data = df_train)
+    cool_model &lt;- lm(cool_load ~ relative_compactness + surface_area + wall_area +
+                       overall_height + glazing_area, data = df_train)
+    
+    # Store each models standardized coefficients 
+    coeffs_heat &lt;- coef(heat_model)
+    coeffs_cool &lt;- coef(cool_model)
+    
+    heat_coeff$relative_compactness[cc] &lt;- abs(coeffs_heat["relative_compactness"])
+    heat_coeff$surface_area[cc] &lt;- abs(coeffs_heat["surface_area"])
+    heat_coeff$wall_area[cc] &lt;- abs(coeffs_heat["wall_area"])
+    heat_coeff$overall_height[cc] &lt;- abs(coeffs_heat["overall_height"])
+    heat_coeff$glazing_area[cc] &lt;- abs(coeffs_heat["glazing_area"])
+    heat_coeff$glazing_area_dist[cc] &lt;- abs(coeffs_heat["glazing_area_dist"])
+    
+    cool_coeff$relative_compactness[cc] &lt;- abs(coeffs_cool["relative_compactness"])
+    cool_coeff$surface_area[cc] &lt;- abs(coeffs_cool["surface_area"])
+    cool_coeff$wall_area[cc] &lt;- abs(coeffs_cool["wall_area"])
+    cool_coeff$overall_height[cc] &lt;- abs(coeffs_cool["overall_height"])
+    cool_coeff$glazing_area[cc] &lt;- abs(coeffs_cool["glazing_area"])
+    
+    # Get the actual values of the heat and cool load data for the test data
+    actuals.heat &lt;- df_test$heat_load
+    actuals.cool &lt;- df_test$cool_load
+    
+    # Make heat and cool load predictions with test data
+    preds.heat &lt;- predict(heat_model, newdata = df_test) # heat load predictions
+    preds.cool &lt;- predict(cool_model, newdata = df_test) # cool load predictions
+    
+    # Calculate and store MAE
+    model_res.heat.MAE[cc] &lt;- mean(abs(actuals.heat - preds.heat))
+    model_res.cool.MAE[cc] &lt;- mean(abs(actuals.cool - preds.cool))
+    
+    # Calculate and store MSE
+    model_res.heat.MSE[cc] &lt;- mean((actuals.heat - preds.heat)^2)
+    model_res.cool.MSE[cc] &lt;- mean((actuals.cool - preds.cool)^2)
+    
+    # Calculate and store MRE, using a small epsilon to avoid dividing by zero
+    model_res.heat.MRE[cc] &lt;- 100 * mean(abs(actuals.heat - preds.heat) / pmax(actuals.heat, 1e-6))
+    model_res.cool.MRE[cc] &lt;- 100 * mean(abs(actuals.cool - preds.cool) / pmax(actuals.cool, 1e-6))
+    
+    # Increment the counter for the next fold and/or repetition
+    cc &lt;- cc + 1
+    
+    # Remove variables that will be recomputed/made, just in case of memory issues
+    suppressWarnings(rm(test_idx, train_idx, df_train, df_test, df_train_raw, df_test_raw,
+                        norm_params, heat_model, cool_model, actuals.heat, actuals.cool,
+                        preds.heat, preds.cool))
+  }
+  
+  # Delete current repetitions shuffled dataset and folds
+  suppressWarnings(rm(df_shuffle, folds))
+}
+
+# Convert the results to vectors
+model_res.heat.MAE &lt;- as.vector(model_res.heat.MAE)
+model_res.heat.MSE &lt;- as.vector(model_res.heat.MSE)
+model_res.heat.MRE &lt;- as.vector(model_res.heat.MRE)
+model_res.cool.MAE &lt;- as.vector(model_res.cool.MAE)
+model_res.cool.MSE &lt;- as.vector(model_res.cool.MSE)
+model_res.cool.MRE &lt;- as.vector(model_res.cool.MRE)
+
+# Compute average MAE, MSE, and MRE
+heat_res.MAE.avg &lt;- mean(model_res.heat.MAE)
+heat_res.MSE.avg &lt;- mean(model_res.heat.MSE)
+heat_res.MRE.avg &lt;- mean(model_res.heat.MRE)
+cool_res.MAE.avg &lt;- mean(model_res.cool.MAE)
+cool_res.MSE.avg &lt;- mean(model_res.cool.MSE)
+cool_res.MRE.avg &lt;- mean(model_res.cool.MRE)
+
+# Compute standard deviation of MAE, MSE, and MRE
+heat_res.MAE.std &lt;- sd(model_res.heat.MAE)
+heat_res.MSE.std &lt;- sd(model_res.heat.MSE)
+heat_res.MRE.std &lt;- sd(model_res.heat.MRE)
+cool_res.MAE.std &lt;- sd(model_res.cool.MAE)
+cool_res.MSE.std &lt;- sd(model_res.cool.MSE)
+cool_res.MRE.std &lt;- sd(model_res.cool.MRE)
+```
+
+Column {.tabset data-width=500}
+---
+
+### Heating Load Model Results
+Heating load model error metrics show the following MAE, MSE, and MRE results:
+
+* $MAE: RF &lt; MLR &lt; IRLS$
+
+* $MSE: RF &lt; MLR &lt; IRLS$
+
+* $MRE: RF &lt; MLR &lt; IRLS$
+
+The RF heating load model significantly outperforms the MLR and IRLS models in every metric. The MLR model outperforms the IRLS model in every metric. These results back up the claim made in the original work: the relationships between the variables are too complicated to be captured with classical regression analysis.
+
+```{r format-results, echo=FALSE, warning=FALSE, message=FALSE}
+# Function to format mean and sd into a string "Mean ± SD"
+fmt_results &lt;- function(data_vec) {
+  avg &lt;- mean(data_vec)
+  std &lt;- sd(data_vec)
+  sprintf("%.2f \u00B1 %.2f", avg, std)
+}
+
+# Create the MLR strings for the heat model
+mlr_heat &lt;- c(
+  MAE = fmt_results(model_res.heat.MAE),
+  MSE = fmt_results(model_res.heat.MSE),
+  MRE = fmt_results(model_res.heat.MRE)
+)
+
+# Create the MLR strings for the cool model
+mlr_cool &lt;- c(
+  MAE = fmt_results(model_res.cool.MAE),
+  MSE = fmt_results(model_res.cool.MSE),
+  MRE = fmt_results(model_res.cool.MRE)
+)
+
+# Create the IRLS string using the results reported by the paper
+irls_heat &lt;- c("2.14 \u00B1 0.24",  # MAE
+               "9.87 \u00B1 2.41",  # MSE
+               "10.09 \u00B1 1.01") # MRE
+
+irls_cool &lt;- c("2.21 \u00B1 0.28",  # MAE
+               "11.46 \u00B1 3.63", # MSE
+               "9.41 \u00B1 0.80")  # MRE
+
+# Create the RF string using the results reported by the paper
+rf_heat &lt;- c("0.51 \u00B1 0.11",  # MAE
+             "1.03 \u00B1 0.54",  # MSE
+             "2.18 \u00B1 0.64")  # MRE
+
+rf_cool &lt;- c("1.42 \u00B1 0.25",  # MAE
+             "6.59 \u00B1 1.56",  # MSE
+             "4.62 \u00B1 0.70")  # MRE
+
+# Create new data frames for the heat and cool load results
+heat_df &lt;- data.frame(
+  Metric = c("MAE", "MSE", "MRE"),
+  
+  # Heat load columns
+  MLR = mlr_heat,
+  IRLS = irls_heat,
+  RF = rf_heat
+)
+
+cool_df &lt;- data.frame(
+  Metric = c("MAE", "MSE", "MRE"),
+  
+  # Cool load columns
+  MLR = mlr_cool,
+  IRLS = irls_cool,
+  RF = rf_cool
+)
+```
+
+```{r heat-load-results, echo=FALSE}
+tt(heat_df) %&gt;%
+  # Group columns under "Heat Load" and "Cool Load" headers
+  group_tt(j = list("Model MAE, MSE, and MRE" = 2:4)) %&gt;%
+  # Rename the columns to just show the model names (removing the _Heat/_Cool suffix)
+  style_tt(i = 0, j = 2:4, text = rep(c("MLR", "IRLS", "RF"), 2)) %&gt;%
+  # Center align all columns
+  style_tt(j = 1:4, align = "c")
+```
+
+### Cooling Load Model Results
+Cooling load model error metrics show the following MAE, MSE, and MRE results:
+
+* $MAE: RF &lt; IRLS &lt; MLR$
+
+* $MSE: RF &lt; MLR &lt; IRLS$
+
+* $MRE: RF &lt; MLR &lt; IRLS$
+
+Like the heating model results, the RF model significantly outperforms the MLR and IRLS models in every metric. However, between the MLR and IRLS models, there is a slight but notable difference in the results for the cooling model.
+
+While the IRLS model achieves a slightly lower average MAE than the MLR model, it has a larger average MSE. This is an interesting result because of how errors are treated in each metric. MAE treats all errors linearly, while MSE penalizes larger errors due to squaring the residual value. This indicates that the MLR model has less extreme errors despite having a higher average error, making it more robust to outliers and new data. This clearly shows that properly selecting predictors outperforms simple learning methods meant to handle noise and outliers. 
+
+The cooling model results further verify the claim that for this dataset, RF is a superior method to MLR and IRLS for regression modeling and analysis. It is much more capable of capturing the non-linear relationships between variables.
+
+```{r cool-load-results, echo=FALSE}
+tt(cool_df) %&gt;%
+  # Group columns under "Heat Load" and "Cool Load" headers
+  group_tt(j = list("Model MAE, MSE, and MRE" = 2:4)) %&gt;%
+  # Rename the columns to just show the model names (removing the _Heat/_Cool suffix)
+  style_tt(i = 0, j = 2:4, text = rep(c("MLR", "IRLS", "RF"), 2)) %&gt;%
+  # Center align all columns
+  style_tt(j = 1:4, align = "c")
+```
+
+### Importance of Variables
+The table shows the importance of each predictor for a given response variable determined via RF. For the MLR model, the "importance" is the magnitude of the standardized coefficients. For a better understanding of how RF determines variable importance, we recommend reviewing the literature [@strobl2007bias]. 
+
+For both models, a larger magnitude for a given predictor indicates a larger impact on the response variable. The values for each model are not on the same scale. The ranking of variable importance is denoted in the parenthesis next to each variables importance value, where 1 is the most important.
+
+The heating and cooling load RF models have similar orders of importance, but the cooling load model found glazing area distribution and orientation to be more important than its heating load counterpart. The heating and cooling load MLR models have the same order of importance for the predictors they have in common.
+
+The heating load model has glazing area distribution area as an additional predictor, but it has the smallest magnitude of all the standardized coefficients. Interestingly, the RF model found that roof area and orientation were two of the least important predictors in both models, both of which were removed as predictors from the MLR models. 
+
+The MLR cooling load model also removed glazing area distribution as a predictor, which the RF cooling load model found to have moderate relative importance. However, both RF models found glazing area to be the most important predictor, while both MLR models found it to be one of the least important variables used. 
+
+The MLR models also significantly overvalued overall height as a predictor in both models. Both RF models found it to be the least important variable. These results point to the same conclusion from the original work: classical regression analysis is not capable of capturing the complex, non-linear relationships in this dataset.
+
+```{r pred-importance, echo=FALSE}
+# Function to format mean and sd into a string "Mean ± SD" including importance rank
+fmt_imp &lt;- function(data_vec) {
+  N &lt;- length(data_vec$Means) # number of fields
+  means &lt;- data_vec$Means # get the means
+  sorted_order &lt;- order(as.vector(means), decreasing = TRUE) # sorted based on average values (large to small)
+  
+  # Create string field for each variable
+  data_vec$res_string &lt;- vector(mode = "character", length = N)
+  for (i in 1:N) {
+    data_vec$res_string[i] &lt;- sprintf("%.2f \u00B1 %.2f (%d)", data_vec$Means[i],
+                                  data_vec$Sigmas[i], which(sorted_order == i))
+  }
+  
+  # Return updated dataframe
+  return(data_vec)
+}
+
+# Create the RF string using the results reported by the paper
+heat_importance_RF &lt;- c("50.51 \u00B1 1.15 (2)",
+             "50.41 \u00B1 1.41 (3)",
+             "40.16 \u00B1 1.09 (4)",
+             "20.40 \u00B1 0.95 (6)",
+             "8.97 \u00B1 0.68 (8)",
+             "18.51 \u00B1 0.44 (7)",
+             "93.12 \u00B1 1.50 (1)",
+             "38.84 \u00B1 0.94 (5)")
+
+cool_importance_RF &lt;- c("43.74 \u00B1 1.11 (2)",
+             "43.55 \u00B1 1.08 (3)",
+             "32.16 \u00B1 0.83 (5)",
+             "20.12 \u00B1 0.87 (7)",
+             "9.41 \u00B1 0.72 (8)",
+             "22.03 \u00B1 0.48 (6)",
+             "86.92 \u00B1 1.58 (1)",
+             "39.07 \u00B1 0.97 (4)")
+
+# Get the MLR heat models variable order of importance
+heat_vars &lt;- c("relative_compactness", "surface_area", "wall_area",
+               "overall_height", "glazing_area", "glazing_area_dist")
+heat_means &lt;- c(mean(heat_coeff$relative_compactness), mean(heat_coeff$surface_area), mean(heat_coeff$wall_area),
+                mean(heat_coeff$overall_height), mean(heat_coeff$glazing_area), mean(heat_coeff$glazing_area_dist))
+heat_sigs &lt;- c(sd(heat_coeff$relative_compactness), sd(heat_coeff$surface_area), sd(heat_coeff$wall_area),
+               sd(heat_coeff$overall_height), sd(heat_coeff$glazing_area), sd(heat_coeff$glazing_area_dist))
+
+heat_coeff_data &lt;- data.frame(
+  Means = heat_means,
+  Sigmas = heat_sigs,
+  Name = heat_vars
+)
+
+heat_coeff_data &lt;- fmt_imp(heat_coeff_data)
+heat_importance_MLR &lt;- c(heat_coeff_data$res_string[1],
+                        heat_coeff_data$res_string[2],
+                        heat_coeff_data$res_string[3],
+                        "NA", # roof_area
+                        heat_coeff_data$res_string[4],
+                        "NA", # orientation
+                        heat_coeff_data$res_string[5],
+                        heat_coeff_data$res_string[6])
+
+# Get the MLR cool models variable order of importance
+
+cool_vars &lt;- c("relative_compactness", "surface_area", "wall_area",
+               "overall_height", "glazing_area", "glazing_area_dist")
+cool_means &lt;- c(mean(cool_coeff$relative_compactness), mean(cool_coeff$surface_area), mean(cool_coeff$wall_area),
+                mean(cool_coeff$overall_height), mean(cool_coeff$glazing_area), mean(cool_coeff$glazing_area_dist))
+cool_sigs &lt;- c(sd(cool_coeff$relative_compactness), sd(cool_coeff$surface_area), sd(cool_coeff$wall_area),
+               sd(cool_coeff$overall_height), sd(cool_coeff$glazing_area), sd(cool_coeff$glazing_area_dist))
+
+cool_coeff_data &lt;- data.frame(
+  Means = cool_means,
+  Sigmas = cool_sigs,
+  Name = cool_vars
+)
+
+cool_coeff_data &lt;- fmt_imp(cool_coeff_data)
+cool_importance_MLR &lt;- c(cool_coeff_data$res_string[1],
+                        cool_coeff_data$res_string[2],
+                        cool_coeff_data$res_string[3],
+                        "NA", # roof_area
+                        cool_coeff_data$res_string[4],
+                        "NA", # orientation
+                        cool_coeff_data$res_string[5],
+                        "NA") # glazing_area_dist
+
+# Create new data frames for the heat and cool load results
+importance_df &lt;- data.frame(
+  Measure = c("relative_compactness", "surface_area", "wall_area", "roof_area",
+             "overall_height", "orientation", "glazing_area", "glazing_are_dist"),
+  
+  # Heat load columns
+  `RF Importance for Heating Load` = heat_importance_RF,
+  `MLR Importance for Heating Load` = heat_importance_MLR,
+  
+  # Cool load columns
+  `RF Importance for Cooling Load` = cool_importance_RF,
+  `MLR Importance for Cooling Load` = cool_importance_MLR
+)
+
+names(importance_df) &lt;- c("Measure", "RF - Heating", "MLR - Heating",
+                          "RF - Cooling", "MLR - Cooling")
+
+# Table showing importance of input variables as determined by RF for the output variables (from original paper)
+tt(importance_df) %&gt;%
+  # Center align all columns
+  style_tt(j = 1:5, align = "c")
+```
+
+Summary
+===
+
+Column {data-width=650}
+---
+
+### Final Model Interpretations {data-height=300}
+Given the final MLR heating and cooling load estimated standardized coefficients, the estimated models can be written as follows:
+
+* $\hat{Heat \space Load} = 6.85(\textit{relative compactness}) + 7.69(\textit{surface area}) + 2.65(\textit{wall area}) + 7.30(\textit{overall height}) + 2.66(\textit{glazing area}) + 0.32(\textit{glazing area distribution})$
+
+* $\hat{Cool \space Load} = 7.49(\textit{relative compactness}) + 7.78(\textit{surface area}) + 1.95(\textit{wall area}) + 7.50(\textit{overall height}) + 1.97(\textit{glazing area})$
+
+Since only the predictors were standardized, interpretation is as follows, within model context. Relative compactness from the heating load model is used here as an example: for every one-standard-deviation change in relative compactness, the expected change in heat load is 6.85 units, holding all other variables constant.
+
+### Conclusion {data-height=700}
+In this project, we perform 10-fold CV of a publicly available dataset from simulated EPB data. Previous work [@tsanas2012accurate] explored the use of IRLS and RF to model heating and cooling loads given 8 predictors, claiming that classical regression analysis was insufficient for capturing the complex nature of the relationships between variables. This work explored that claim by going through a model selection process that removed insignificant predictors from the heating and cooling load models when using the full dataset. 10-fold CV testing was conducted 100 times to replicate the experiment in the original work, providing MAE, MSE, and MRE metrics for direct comparison to the published IRLS and RF results. 
+
+We found that while RF was superior to the MLR models in this work, proper variable selection for the MLR models actually resulted in better performance than the IRLS models. Since IRLS is designed specifically for optimizing regression model coefficients and to handle outliers, this is a significant result. It shows that while RF is still superior for better capturing highly non-linear relationships, finely selecting the best predictors for classical regression analysis is better than simply using all variables and using IRLS in an attempt to optimize the model.
+
+It is important to note that all of the results from this project, and the published work, is unlikely to generalize well in the real world. The size of the dataset alone (768 observations) is not enough to generalize to cities, nations, or the world. In addition, all of the buildings in this $\textit{simulated}$ dataset had very specific constraints, including:
+
+* Identical build quality and materials
+
+* Same number of residents per building (7)
+
+* All buildings were located in Athens, Greece
+
+* All buildings used a fixed activity rate of 70 Watts
+
+However, the dataset is sufficient for comparing estimated models using different methods. This is important when it comes to real-world data, as the results from this work, the published work, and any prior work, guide intuitions and decisions made when it comes to real-world analysis.
+
+Column {data-width=350}
+---
+
+### Author Information
+Eric Smith is a PhD student in the department of Electrical and Computer Engineering at the University of Dayton. He holds a B.S. in Physics from the Ohio State University and M.S. in Electro-Optics from the University of Dayton. He works full-time for a small defense contractor in Beavercreek, Ohio, specializing in directed energy and atmospheric simulation, modeling, and measurement. His research interests broadly include computer vision problems involving object detection and tracking, with his most recent work focused on a modular algorithm for small drone detection and tracking.
+
+### References
+&lt;div id="refs"&gt;&lt;/div&gt;
+
+### Disclaimers
+ChatGPT, Google AI Overview, and Google Gemini were used to help with general code problems, like syntax, as well as determining necessary libraries and how to use their functions in R. Google Gemini was used to generate the IRLS flowchart and RF illustration in Figures [2](#IRLS-Flowchart) and [3](#RF-illustration), respectively.
+</code></pre>
+</div>
+<script type="text/javascript">
+$(document).ready(function () {
+  FlexDashboard.init({
+    fillPage: true,
+    orientation: "columns",
+    storyboard: false,
+    defaultFigWidth: 576,
+    defaultFigHeight: 460,
+    defaultFigWidthMobile: 360,
+    defaultFigHeightMobile: 460,
+    resize_reload: true
+  });
+  var navbar = $(".navbar").first();
+  var body = $("body").first();
+  var sidebar = $(".section.sidebar").first();
+  function addNavbarPadding() {
+    var navHeight = navbar.outerHeight();
+    body.css("padding-top", (navHeight + 8) + "px");
+    sidebar.css("top", navHeight + "px");
+    var resizeEvent = window.document.createEvent("UIEvents");
+    resizeEvent.initUIEvent("resize", true, false, window, 0);
+    window.dispatchEvent(resizeEvent);
+  }
+  if (!window.Shiny) setTimeout(addNavbarPadding, 100);
+  $(document).on("shiny:idle", function() {
+    setTimeout(addNavbarPadding, 50);
+  });
+});
+</script>
+
+</body>
+</html>

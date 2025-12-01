@@ -1,0 +1,884 @@
+---
+# title: 'MTH 543: Final Project'
+title: 'Energy Performance Estimation'
+author: "Eric Smith"
+# date: "`r Sys.Date()`"
+output: 
+  flexdashboard::flex_dashboard:
+    theme:
+      version: 4 # preferred over v5
+      # version: 5
+      # bootswatch: cosmo
+      bootswatch: darkly # theme
+      navbar-bg: "purple"
+    orientation: columns
+    vertical_layout: fill
+    # vertical_layout: scroll
+    source_code: embed
+bibliography: references.bib
+csl: asta-advances-in-statistical-analysis.csl
+---
+
+<style>
+.chart-title {  /* chart_title  */
+   font-size: 16px;
+  }
+body{ /* Normal  */
+      font-size: 14px;
+  }
+</style>
+
+<head>
+  <base target="_blank">
+</head>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(flexdashboard)
+```
+
+Project Overview
+===
+
+Column {data-width=650}
+---
+
+### Goal {data-height=35}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+rm(list = ls()) # clears global workspace to start fresh
+library(pacman)
+pacman::p_load(rstudioapi, DataExplorer, modelsummary, readxl, caret,
+               corrplot, MASS, leaps, tidymodels, tinytable, dplyr, gt, tibble)
+
+# Set the working directory to this files location
+# script_path <- rstudioapi::getActiveDocumentContext()$path
+# script_dir <- dirname(script_path)
+# setwd(script_dir)
+setwd("E:/School/PhD/Classes/MTH543/FinalProject/MTH-543-Final-Project")
+```
+In this final project, we perform regression analysis using building specifications to estimate energy performance of buildings (EPB), specifically heat load and cool load. The dataset used in this work is a publicaly available simulated dataset found in the UC Irvine Machine Learning Repository ([dataset link](https://archive.ics.uci.edu/dataset/242/energy+efficiency)). In this particular dataset, there are 12 different building shapes, differing with respect to the glazing area, glazing area distribution, and orientation, as well as some other variables.
+
+### Dataset Overview {data-height=30}
+In total, there are 768 observations (buildings). There are 8 predictor variables and 2 response variables. Figure [1](#intro-plot) shows a basic summary of the full dataset. From this plot, we find that the entire dataset is clean with no missing data. This is a simulated dataset that was created to investigate the effect of eight input variables on determining two output variables. The "Dataset Variables" table shows the variable names and number of possible values.
+
+
+### Simulated Building Information {data-height=70}
+There are 12 simulated building forms in total, composed of 18 "elements." The following assumptions are made for all buildings:
+
+* Location and occupants: Residential building in Athens, Greece, with 7 residents
+
+* Fixed activity of 70 Watts
+
+* All internal and thermal properties are the same
+
+* $(12 \text{ building forms } \times 3 \text{ glazing area variations } \times 5 \text{ glazing area distributions } \times 4 \text{ orientations }) + (12 \text{ building forms } \times 4 \text{ orientations w/o glazing}) = 768 \text{ buildings}$
+
+### Project Focus {data-height=90}
+This project focuses on a specific claim made in the original work: classical regression analysis is insufficient for modeling with this dataset, hence favoring IRLS and RF. This final project aims to verify the claim. The end goal is to determine if the claim is true, and if so, how much better is IRLS and RF than classical regression analysis and modeling? This will be done by comparing the provided mean absolute error (MAE), mean square error (MSE), and mean relative error (MRE) values in the original work and comparing it with those found in this project. 
+
+The first step is perform exploratory data analysis (EDA). Then, the best set of variables to use for modeling heating and cooling loads will be found using several processes. This will be done using the entire dataset. Once the variables for each model have been chosen, the same experiment conducted in the original work to determine the  MAE, MSE, and MRE of the IRLS and RF models will be performed. This involves many repetitions of shuffling the dataset, creating training and testing splits, fitting models, and measuring errors. This will be discussed in further detail in the "Model Analysis" section. 
+
+Before EDA, we perform a brief introduction of IRLS and RF to better understand how each works. This is done in the "Background" section.
+
+Column {data-width=350}
+---
+
+### Introduction Plot {data-height=54}
+<!-- Figure 1 -->
+<a name="intro-plot"></a>
+```{r intro-plot, echo=FALSE, fig.width=9}
+# Load the data and remove missing data
+df <- read_excel("./data/ENB2012_data.xlsx", na = c("?", "NA"))
+
+# Rename the variables to their defined names
+df <- df %>% rename(relative_compactness = X1, surface_area = X2,
+                    wall_area = X3, roof_area = X4, overall_height = X5,
+                    orientation = X6, glazing_area = X7, glazing_area_dist = X8,
+                    heat_load = Y1, cool_load = Y2)
+
+plot_intro(df) # visualize basic information about the full dataset
+```
+
+### Dataset Variables {data-height=46}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+# Define the variable information
+vars <- c("X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "Y1", "Y2")
+var_names <- c("Relative compactness", "Surface area", "Wall area", "Roof area",
+               "Overall height", "Orientation", "Glazing area", "Glazing area distribution",
+               "Heating load", "Cooling load")
+n_vals <- c(12, 12, 7, 4, 2, 4, 4, 6, 586, 636)
+
+# Create a data frame of variable information
+var_df <- data.frame(
+  Variable = vars,
+  Name = var_names,
+  Vals = n_vals
+)
+
+# Rename column headers
+names(var_df) <- c("Variable", "Variable Names", "Number of Possible Values")
+
+# Create the table
+tt(var_df) %>%
+  # Center align columns
+  style_tt(j = 1:3, align = "c")
+```
+
+Background
+===
+
+Column {data-width=600}
+---
+
+### Overview {data-height=70}
+In the original work [@tsanas2012accurate], statistical machine learning methods are used to train and test models on the dataset to predict heat and cool loads given all predictors. The reason for investigating statistical machine learning for this specific problem is that classical least squares regression techniques is unable to sufficiently model and capture the non-linear nature of the problem. Two methods are explored in the original work: iteratively reweighted least squares (IRLS) and random forest (RF).
+
+In addition, we briefly discuss why Spearman rank correlation is used instead of Pearson correlation.
+
+### Iteratively Reweighted Least Squares (IRLS) {data-height=75}
+IRLS is simpler than RF and is a commonly used regression method. It works by adjusting the weights of a regression models coefficients to reduce the impact of outliers in data. This ultimately leads to an improved least squares estimate and overall model fit. More information on IRLS can be found in literature [@bishop2006pattern; @tsanas2009accurate]. However, in applications where residuals do not follow a Gaussian distribution, IRLS can struggle to sufficiently model complex relationships. For this reason, RF is also used for regression analysis with this dataset.
+
+A basic flowchart of IRLS is shown in Figure [2](#IRLS-flowchart). The flowchart was generated using Google Gemini.
+
+### Random Forst (RF) {data-height=95}
+RF is an extension of the classification and regression tree (CART). CART is a nonlinear method designed for classification and regression analysis. When response variables are categorical, it serves as a classification model. It can also be used to build regression trees when predictors are continuous, numeric values. 
+
+The concept of CART is to repeatedly split an input feature space (predictors) into smaller sub-regions. The feature space is iteratively split into smaller and smaller sub-regions until it is not possible to split it any more, or some criterion to stop splitting has been met. RF is a collection of many "trees," or a collection of CART models. To obtain this collection of models, a random subset of the variables are chosen for each model, and then the CART procedure is performed for each tree.
+
+A simple illustration of RF is shown in Figure [3](#RF-illustration). The illustration was generated using Google Gemini.
+
+### Spearman Rank Correlation {data-height=95}
+Spearman rank correlation is used instead of the Pearson correlation since that is what the original work chose to do. This decision was made because most of the predictors have non-Gaussian distributions and non-linear relationships. This method determines how well the relationship between two variables can be described using a monotonic function.
+
+<!-- This method determines how well the relationship between two variables can be described using a monotonic function, i.e. a function that only ever increases or decreases, but not necessarily at a constant rate. Instead of using the raw data, each variable is converted into a set of ranks. The ranks of two variables are used to determine the correlation coefficient.  -->
+
+The coefficient value is between -1 and 1, where a negative value indicates an inversely proportional relatinship and a positive value indicates a proportional relationship.
+
+Column {data-width=400}
+---
+
+### IRLS Flowchart {data-height=400}
+<!-- Figure 2 -->
+<a name="IRLS-flowchart"></a>
+```{r IRLS-flowchart, echo=FALSE, warning=FALSE, message=FALSE}
+knitr::include_graphics("./Figures/IRLS_Flowchart.png")
+```
+
+### RF Illustration {data-height=600}
+<!-- Figure 3 -->
+<a name="RF-illustration"></a>
+```{r RF-illustration, echo=FALSE, warning=FALSE, message=FALSE}
+knitr::include_graphics("./Figures/RF_Regression.png")
+```
+
+EDA
+===
+
+Column {data-width=375}
+---
+
+### Investigating the Data
+We begin with EDA of the full dataset. Discussion and conclusions and can be found in each tab for the following plots and tables:
+
+* Pairwise scatterplots
+
+* Predictor variable histograms
+
+* Response variable histograms
+
+* Spearman rank correlation coefficients between predictors and response variables
+
+Column {.tabset data-width=625}
+---
+
+### Scatterplots
+
+#### Discussion
+The pairwise scatterplot shows scatterplots for all predictor and response variables. There are no linear relationships between variables except for:
+
+* Heat load and cool load
+
+* Relative compactness and surface area
+
+Since heat load and cool load are not used as predictors of one another, this relationship is not very useful. This supports the claim made by the original work: classical regression may be insufficient for modeling the complex relationships in this data.
+
+```{r scatter-plots, fig.width=12, fig.height=5.76, fig.align='center', echo=FALSE}
+oldpar <- par(no.readonly = TRUE)
+par(bg = "white")
+pairs(~heat_load + cool_load + relative_compactness + surface_area + wall_area + roof_area +
+        overall_height + orientation + glazing_area + glazing_area_dist, data = df) # Pairwise scatterplots
+par(oldpar)
+```
+
+### Predictor Histograms
+
+#### Discussion
+The predictor histograms show the following distributions found in the data:
+
+* Discretely uniformly distributed: orientation, relative compactness, and surface area
+
+* Piecewise uniform: glazing area and glazing area distribution
+
+* Left-skewed: Roof area
+
+* Normal: wall area
+
+These distributions are intentional and to be expected due to the discrete nature of the data and the constraints around the simulated buildings discussed earlier.Note that there is no histogram shown for overall height. This is due to the discreteness of the data. There are only two possible values for this predictor: 3.5 and 7 meters.
+
+```{r predictor-histograms, fig.width=12, fig.height=5.04, fig.align='center', echo=FALSE}
+plot_histogram(df[, c(1:8)], nrow = 2, ncol = 4) # histograms of predictors
+```
+
+### Response Histograms
+
+#### Discussion
+The response histograms show the following distribution found in the data:
+
+* Bimodal distribution: heat load and cool load
+
+By design, there is more continuity in the distributions of both response variables. There appears to be a slight imbalance in both variables, though this could partially be attributed to the size of the histogram bins.
+
+```{r response-histograms, fig.width=12, fig.height=6.24, fig.align='center', echo=FALSE}
+plot_histogram(df[, c(-1:-8)], nrow = 1, ncol = 2) # histograms of response variables
+```
+
+### Spearman Correlation Analysis
+
+#### Discussion
+Based on the Spearman rank correlation table, the following predictors have the strongest monotonic relationship with heating load, whether proportional or not: 
+
+* Overall height = 0.861 (proportional)
+
+* Roof area = -0.804 (inversely proportional)
+
+* Relative compactness = 0.622 (proportional)
+
+* Surface area = -0.622 (inversely proportional)
+
+* Wall area = 0.471 (proportional)
+
+Perhaps unsurprisingly, the same relationships hold true for cooling load as well.
+
+```{r spearman-plots, echo=FALSE}
+# spearman_cor <- cor(df[, c(1:8)], method = "spearman") # Spearman correlation matrix of predictors
+spearman_cor <- cor(df, method = "spearman") # Spearman correlation matrix of predictors
+heat_cor <- spearman_cor[9, 1:8] # Spearman rank correlation coefficients between predictors and heat load
+cool_cor <- spearman_cor[10, 1:8] # Spearman rank correlation coefficients between predictors and cool load
+
+fmt_cor <- function(val) {
+  sprintf("%1.3f", val)
+}
+
+# Format the correlation coefficients to put into a table
+cor_names <- c("Relative compactness", "Surface area", "Wall area", "Roof area",
+               "Overall height", "Orientation", "Glazing area",
+               "Glazing area distribution")
+heat_cor_tt <- array(data = NA, dim = c(1, length(heat_cor)))
+cool_cor_tt <- array(data = NA, dim = c(1, length(cool_cor)))
+
+for (i in 1:length(heat_cor)) {
+  heat_cor_tt[i] <- fmt_cor(heat_cor[i])
+  cool_cor_tt[i] <- fmt_cor(cool_cor[i])
+}
+
+cor_df <- data.frame(
+  Predictor = cor_names,
+  `Correlation with Heat Load` = as.vector(heat_cor_tt),
+  `Correlation with Cool Load` = as.vector(cool_cor_tt)
+)
+
+names(cor_df) <- c("Predictor", "Correlation Coefficient with Heat Load", "Correlation Coefficient with Cool Load")
+
+tt(cor_df) %>%
+  style_tt(j = 1:3, align = "c")
+```
+
+Model Selection
+===
+
+Column {data-width=300}
+---
+
+### Procedure
+Model selection is an important step in classical regression analysis that aims to balance the trade-off between complexity and goodness-of-fit. This process makes sure the model captures real underlying patterns without overfitting. It is crucial for identifying a subset of variables, aiming to eliminate multicollinearity and obtain a model that is both interpretable and can generalize to new data.
+
+To find the optimal set of predictors to use for modeling heating and cooling loads, four selection processes are used:
+
+* Forward Selection
+
+* Backward Selection
+
+* Stepwise Selection
+
+* Best Subset Selection
+
+These processes are used for determining the best combination of variables for the heating and cooling load models. In theory, we can end up with four different models to choose from. 
+
+To make a final selection, we choose the model with the largest adjusted $R^2$ (similar to the best subset selection process) and/or the lowest root mean square error (RMSE). We use a significance level of $\alpha = 0.01$, the same as the original work. Model summary tables show the coefficient estimates and their significance level.
+
+Column {.tabset data-width=700}
+---
+
+### Heat Load Models
+For the heating load model, the backward, stepwise, and best subset selection processes produced the same model. The forward selection process provided a model with an additional predictor, very slightly reducing its adjusted $R^2$. For that reason, we go with the model selected from the other three process. The predictors that will be used for modeling heating load are:
+
+* Relative compactness
+
+* Surface area
+
+* Wall area
+
+* Overall height
+
+* Glazing area
+
+* Glazing area distribution
+
+```{r heat-forward-model-summary, echo=FALSE, warning=FALSE, message=FALSE}
+# Set the seed for random permutations of data later 
+set.seed(3)
+
+full.heat_model <- lm(heat_load ~ relative_compactness + surface_area + wall_area + roof_area + 
+                        overall_height + orientation + glazing_area + glazing_area_dist, data = df)
+
+full_fit.heat_forward <- stepAIC(full.heat_model, direction = "forward", trace = FALSE) # forward model
+full_fit.heat_backward <- stepAIC(full.heat_model, direction = "backward", trace = FALSE) # backward model
+full_fit.heat_step <- stepAIC(full.heat_model, direction = "both", trace = FALSE) # stepwise model
+
+# Best subset model
+full_fit.heat_subsets <- regsubsets(heat_load ~ relative_compactness + surface_area + wall_area + 
+            overall_height + orientation + glazing_area + glazing_area_dist, data = df, nvmax = 6)
+
+subs_heat_full <- summary(full_fit.heat_subsets)
+subs_sum_heat_full <- summary(subs_heat_full)
+best_size_heat_full <- which.max(subs_heat_full$adjr2)
+best_terms_heat_full <- names(coef(full_fit.heat_subsets, best_size_heat_full))[-1]
+best_formula_heat_full <- as.formula(paste("heat_load ~ ", paste(best_terms_heat_full, collapse = "+")))
+full_fit.heat_best <- lm(best_formula_heat_full, data = df)
+
+ms_heat <- modelsummary(
+  list("Forward Selection" = full_fit.heat_forward, "Backward Selection" = full_fit.heat_backward,
+       "Stepwise Selection" = full_fit.heat_step, "Best Subset" = full_fit.heat_best),
+  statistic = NULL,
+  gof_map = c("r.squared", "adj.r.squared", "nobs", "rmse"),
+  title = "Heat Load Model Regression Results",
+  escape = FALSE,
+  stars = TRUE
+)
+ms_heat %>%
+    style_tt(i = 1:20, j = 1:5, background = "white", color = "white", bold = TRUE)
+```
+
+### Cool Load Models
+For the cooling load model, all four processes resulted in nearly identical adjusted $R^2$ values. The forward selection model produced a very slightly reduced RMSE at the expense of including an additional predictor. We choose the less complex model that achieves nearly identical performance. The predictors that will be used for modeling cooling load are:
+
+* Relative compactness
+
+* Surface area
+
+* Wall area
+
+* Overall height
+
+* Glazing area
+
+These are the same predictors used as the heating load model, minus glazing area distribution.
+
+```{r cool-forward-model-summary, echo=FALSE, warning=FALSE, message=FALSE}
+full.cool_model <- lm(cool_load ~ relative_compactness + surface_area + wall_area + roof_area +
+                        overall_height + orientation + glazing_area + glazing_area_dist, data = df)
+
+full_fit.cool_forward <- stepAIC(full.cool_model, direction = "forward", trace = FALSE) # forward model
+full_fit.cool_backward <- stepAIC(full.cool_model, direction = "backward", trace = FALSE) # backward model
+full_fit.cool_step <- stepAIC(full.cool_model, direction = "both", trace = FALSE) # stepwise model
+
+# Best subset model
+full_fit.cool_subsets <- regsubsets(cool_load ~ relative_compactness + surface_area + wall_area +
+              overall_height + orientation + glazing_area + glazing_area_dist, data = df, nvmax = 6)
+
+subs_cool_full <- summary(full_fit.cool_subsets)
+subs_sum_cool_full <- summary(subs_cool_full)
+best_size_cool_full <- which.max(subs_cool_full$adjr2)
+best_terms_cool_full <- names(coef(full_fit.cool_subsets, best_size_cool_full))[-1]
+best_formula_cool_full <- as.formula(paste("cool_load ~ ", paste(best_terms_cool_full, collapse = "+")))
+full_fit.cool_best <- lm(best_formula_cool_full, data = df)
+
+ms_cool <- modelsummary(
+  list("Forward Selection" = full_fit.cool_forward, "Backward Selection" = full_fit.cool_backward,
+       "Stepwise Selection" = full_fit.cool_step, "Best Subset" = full_fit.cool_best),
+  statistic = NULL,
+  gof_map = c("r.squared", "adj.r.squared", "nobs", "rmse"),
+  title = "Cool Load Model Regression Results",
+  escape = FALSE,
+  stars = TRUE
+)
+ms_cool %>%
+    style_tt(i = 1:20, j = 1:5, background = "white", color = "white", bold = TRUE)
+```
+
+Model Analysis
+===
+
+Column {data-width=500}
+---
+
+### Cross-Validation Procedure
+After model selection, the K-fold cross-validation (CV) experiment is conducted. We choose to standardize the predictors in order to assess the influence of each predictor on the response variables on the same scale. We use the same experiment parameters as the original work:
+
+* $K = 10$
+
+* Repetitions = 100
+
+This means that the dataset is split into $K = 10$ equally (or nearly equally) sized "folds." For training the model, 9 of the 10 folds are used, while 1 fold is set aside for testing. This is done to test model generalization. Each fold is used once for testing, meaning the model is trained 10 separate times on different combinations of folds. This is one "repetition" of the process. 
+
+We perform 100 repetitions using 10-fold CV. The dataset is randomly shuffled at the beginning of each repetition so that unique folds are created for each repetition. After testing every test fold, the MAE, MSE, and MRE metrics are computed for the trained model.
+
+### Error Metrics
+To compare the MLR models to the original work, we use MAE, MSE, and MRE, defined as:
+
+* $MAE = \dfrac{1}{S} \Sigma_{i \epsilon Q} |y_i - \hat{y}_i|$,
+
+* $MSE = \dfrac{1}{S} \Sigma_{i \epsilon Q} |y_i - \hat{y}_i|^2$,
+
+* $MRE = \dfrac{100}{S} \Sigma_{i \epsilon Q} \dfrac{|y_i - \hat{y}_i|}{y_i}$,
+
+where $\hat{y}_i$ is the predicted output variable, $y_i$ is the actual output variable for the $i^{th}$ entry in the test fold, $S$ is the number of samples in the test fold, and $Q$ contains the indices of the test fold. Each repetition results in 10 independent error measurements. 
+
+We end up with 1000 independent error measurements given $K = 10$ and 100 repetitions. The reported MAE, MSE, and MRE values are the average values of all the measurements, plus or minus one standard deviation. The reported errors for the IRLS and RF models come directly from the original work [@tsanas2012accurate].
+
+```{r k-fold-testing, echo=FALSE, warning=FALSE, message=FALSE}
+# Define the number of repetitions and folds
+nRep <- 100
+kFold <- 10
+
+# Create empty vectors for model results found during evaluation
+empty_vecs <- c(1, nRep*kFold) # dimensionality of result vectors
+model_res.heat.MAE <- array(data = NA, dim = empty_vecs)
+model_res.heat.MSE <- array(data = NA, dim = empty_vecs)
+model_res.heat.MRE <- array(data = NA, dim = empty_vecs)
+model_res.cool.MAE <- array(data = NA, dim = empty_vecs)
+model_res.cool.MSE <- array(data = NA, dim = empty_vecs)
+model_res.cool.MRE <- array(data = NA, dim = empty_vecs)
+
+# Create empty vectors for model coefficients obtained during evaluation
+heat_coeff <- tibble(
+  relative_compactness = as.vector(array(data = NA, dim = empty_vecs)),
+  surface_area = as.vector(array(data = NA, dim = empty_vecs)),
+  wall_area = as.vector(array(data = NA, dim = empty_vecs)),
+  overall_height = as.vector(array(data = NA, dim = empty_vecs)),
+  glazing_area = as.vector(array(data = NA, dim = empty_vecs)),
+  glazing_area_dist = as.vector(array(data = NA, dim = empty_vecs))
+)
+
+cool_coeff <- tibble(
+  relative_compactness = as.vector(array(data = NA, dim = empty_vecs)),
+  surface_area = as.vector(array(data = NA, dim = empty_vecs)),
+  wall_area = as.vector(array(data = NA, dim = empty_vecs)),
+  overall_height = as.vector(array(data = NA, dim = empty_vecs)),
+  glazing_area = as.vector(array(data = NA, dim = empty_vecs))
+)
+
+# Define the predictor variables, used later for normalization
+pred_vars <- c("relative_compactness", "surface_area", "wall_area", 
+               "roof_area", "overall_height", "orientation", 
+               "glazing_area", "glazing_area_dist")
+
+# Perform 100 repetitions of 10-fold CV testing with the data
+cc <- 1 # index counter for storing results 
+for (i in 1:nRep) {
+  # At the beginning of each repetition, randomly shuffle the entire dataset
+  df_shuffle <- df[sample(nrow(df)), ]
+  
+  # Create cross-validation (CV) folds using caret --> createFolds function
+  folds.test_idx <- createFolds(y = df_shuffle$heat_load, k = kFold, list = TRUE, returnTrain = FALSE) # test data folds
+  folds.train_idx <- list() # placeholder list for training data folds
+  
+  # Loop through the test folds and get corresponding training folds
+  for (j in 1:length(folds.test_idx)) {
+    field_name <- sprintf("Fold%02d", j) # Current fold name
+    test_indices <- folds.test_idx[[j]] # current folds test indices
+    
+    # Calculate the training indices and set in folds list
+    new_idx <- setdiff(seq_len(nrow(df_shuffle)), test_indices)
+    folds.train_idx[[field_name]] <- new_idx # current folds training indices
+    
+    # Clear loop specific variables
+    suppressWarnings(rm(field_name, test_indices, new_idx))
+  }
+  
+  # Loop through each fold for the current repetition and create a MLR using the predictors pre-determined to be the best
+  # for the heat load and cool load models
+  # Heat model predictors: relative_compactness, surface_area, wall_area, overall_height, glazing_area, glazing_area_dist
+  # Cool model predictors: relative_compactness, surface_area, wall_area, overall_height, glazing_area
+  
+  for (j in 1:length(folds.test_idx)) {
+    test_idx <- folds.test_idx[[j]] # current folds test indices
+    train_idx <- folds.train_idx[[j]] # current folds training indices
+    
+    # Get the raw training and testing data
+    df_train_raw <- df_shuffle[train_idx, ]
+    df_test_raw <- df_shuffle[test_idx, ]
+    
+    # Calculate normalization parameters using training data predictors
+    # norm_params <- preProcess(df_train_raw[, pred_vars], method = c("range")) # normalizes predictors 0-1
+    norm_params <- preProcess(df_train_raw[, pred_vars], method = c("center", "scale")) # standardizes predictors
+    
+    # Normalize predictors based on the current training fold
+    df_train <- predict(norm_params, df_train_raw)
+    df_test  <- predict(norm_params, df_test_raw)
+    
+    # Fit the heat and cool load models using the current training data
+    heat_model <- lm(heat_load ~ relative_compactness + surface_area + wall_area +
+                       overall_height + glazing_area + glazing_area_dist, data = df_train)
+    cool_model <- lm(cool_load ~ relative_compactness + surface_area + wall_area +
+                       overall_height + glazing_area, data = df_train)
+    
+    # Store each models standardized coefficients 
+    coeffs_heat <- coef(heat_model)
+    coeffs_cool <- coef(cool_model)
+    
+    heat_coeff$relative_compactness[cc] <- abs(coeffs_heat["relative_compactness"])
+    heat_coeff$surface_area[cc] <- abs(coeffs_heat["surface_area"])
+    heat_coeff$wall_area[cc] <- abs(coeffs_heat["wall_area"])
+    heat_coeff$overall_height[cc] <- abs(coeffs_heat["overall_height"])
+    heat_coeff$glazing_area[cc] <- abs(coeffs_heat["glazing_area"])
+    heat_coeff$glazing_area_dist[cc] <- abs(coeffs_heat["glazing_area_dist"])
+    
+    cool_coeff$relative_compactness[cc] <- abs(coeffs_cool["relative_compactness"])
+    cool_coeff$surface_area[cc] <- abs(coeffs_cool["surface_area"])
+    cool_coeff$wall_area[cc] <- abs(coeffs_cool["wall_area"])
+    cool_coeff$overall_height[cc] <- abs(coeffs_cool["overall_height"])
+    cool_coeff$glazing_area[cc] <- abs(coeffs_cool["glazing_area"])
+    
+    # Get the actual values of the heat and cool load data for the test data
+    actuals.heat <- df_test$heat_load
+    actuals.cool <- df_test$cool_load
+    
+    # Make heat and cool load predictions with test data
+    preds.heat <- predict(heat_model, newdata = df_test) # heat load predictions
+    preds.cool <- predict(cool_model, newdata = df_test) # cool load predictions
+    
+    # Calculate and store MAE
+    model_res.heat.MAE[cc] <- mean(abs(actuals.heat - preds.heat))
+    model_res.cool.MAE[cc] <- mean(abs(actuals.cool - preds.cool))
+    
+    # Calculate and store MSE
+    model_res.heat.MSE[cc] <- mean((actuals.heat - preds.heat)^2)
+    model_res.cool.MSE[cc] <- mean((actuals.cool - preds.cool)^2)
+    
+    # Calculate and store MRE, using a small epsilon to avoid dividing by zero
+    model_res.heat.MRE[cc] <- 100 * mean(abs(actuals.heat - preds.heat) / pmax(actuals.heat, 1e-6))
+    model_res.cool.MRE[cc] <- 100 * mean(abs(actuals.cool - preds.cool) / pmax(actuals.cool, 1e-6))
+    
+    # Increment the counter for the next fold and/or repetition
+    cc <- cc + 1
+    
+    # Remove variables that will be recomputed/made, just in case of memory issues
+    suppressWarnings(rm(test_idx, train_idx, df_train, df_test, df_train_raw, df_test_raw,
+                        norm_params, heat_model, cool_model, actuals.heat, actuals.cool,
+                        preds.heat, preds.cool))
+  }
+  
+  # Delete current repetitions shuffled dataset and folds
+  suppressWarnings(rm(df_shuffle, folds))
+}
+
+# Convert the results to vectors
+model_res.heat.MAE <- as.vector(model_res.heat.MAE)
+model_res.heat.MSE <- as.vector(model_res.heat.MSE)
+model_res.heat.MRE <- as.vector(model_res.heat.MRE)
+model_res.cool.MAE <- as.vector(model_res.cool.MAE)
+model_res.cool.MSE <- as.vector(model_res.cool.MSE)
+model_res.cool.MRE <- as.vector(model_res.cool.MRE)
+
+# Compute average MAE, MSE, and MRE
+heat_res.MAE.avg <- mean(model_res.heat.MAE)
+heat_res.MSE.avg <- mean(model_res.heat.MSE)
+heat_res.MRE.avg <- mean(model_res.heat.MRE)
+cool_res.MAE.avg <- mean(model_res.cool.MAE)
+cool_res.MSE.avg <- mean(model_res.cool.MSE)
+cool_res.MRE.avg <- mean(model_res.cool.MRE)
+
+# Compute standard deviation of MAE, MSE, and MRE
+heat_res.MAE.std <- sd(model_res.heat.MAE)
+heat_res.MSE.std <- sd(model_res.heat.MSE)
+heat_res.MRE.std <- sd(model_res.heat.MRE)
+cool_res.MAE.std <- sd(model_res.cool.MAE)
+cool_res.MSE.std <- sd(model_res.cool.MSE)
+cool_res.MRE.std <- sd(model_res.cool.MRE)
+```
+
+Column {.tabset data-width=500}
+---
+
+### Heating Load Model Results
+Heating load model error metrics show the following MAE, MSE, and MRE results:
+
+* $MAE: RF < MLR < IRLS$
+
+* $MSE: RF < MLR < IRLS$
+
+* $MRE: RF < MLR < IRLS$
+
+The RF heating load model significantly outperforms the MLR and IRLS models in every metric. The MLR model outperforms the IRLS model in every metric. These results back up the claim made in the original work: the relationships between the variables are too complicated to be captured with classical regression analysis.
+
+```{r format-results, echo=FALSE, warning=FALSE, message=FALSE}
+# Function to format mean and sd into a string "Mean ± SD"
+fmt_results <- function(data_vec) {
+  avg <- mean(data_vec)
+  std <- sd(data_vec)
+  sprintf("%.2f \u00B1 %.2f", avg, std)
+}
+
+# Create the MLR strings for the heat model
+mlr_heat <- c(
+  MAE = fmt_results(model_res.heat.MAE),
+  MSE = fmt_results(model_res.heat.MSE),
+  MRE = fmt_results(model_res.heat.MRE)
+)
+
+# Create the MLR strings for the cool model
+mlr_cool <- c(
+  MAE = fmt_results(model_res.cool.MAE),
+  MSE = fmt_results(model_res.cool.MSE),
+  MRE = fmt_results(model_res.cool.MRE)
+)
+
+# Create the IRLS string using the results reported by the paper
+irls_heat <- c("2.14 \u00B1 0.24",  # MAE
+               "9.87 \u00B1 2.41",  # MSE
+               "10.09 \u00B1 1.01") # MRE
+
+irls_cool <- c("2.21 \u00B1 0.28",  # MAE
+               "11.46 \u00B1 3.63", # MSE
+               "9.41 \u00B1 0.80")  # MRE
+
+# Create the RF string using the results reported by the paper
+rf_heat <- c("0.51 \u00B1 0.11",  # MAE
+             "1.03 \u00B1 0.54",  # MSE
+             "2.18 \u00B1 0.64")  # MRE
+
+rf_cool <- c("1.42 \u00B1 0.25",  # MAE
+             "6.59 \u00B1 1.56",  # MSE
+             "4.62 \u00B1 0.70")  # MRE
+
+# Create new data frames for the heat and cool load results
+heat_df <- data.frame(
+  Metric = c("MAE", "MSE", "MRE"),
+  
+  # Heat load columns
+  MLR = mlr_heat,
+  IRLS = irls_heat,
+  RF = rf_heat
+)
+
+cool_df <- data.frame(
+  Metric = c("MAE", "MSE", "MRE"),
+  
+  # Cool load columns
+  MLR = mlr_cool,
+  IRLS = irls_cool,
+  RF = rf_cool
+)
+```
+
+```{r heat-load-results, echo=FALSE}
+tt(heat_df) %>%
+  # Group columns under "Heat Load" and "Cool Load" headers
+  group_tt(j = list("Model MAE, MSE, and MRE" = 2:4)) %>%
+  # Rename the columns to just show the model names (removing the _Heat/_Cool suffix)
+  style_tt(i = 0, j = 2:4, text = rep(c("MLR", "IRLS", "RF"), 2)) %>%
+  # Center align all columns
+  style_tt(j = 1:4, align = "c")
+```
+
+### Cooling Load Model Results
+Cooling load model error metrics show the following MAE, MSE, and MRE results:
+
+* $MAE: RF < IRLS < MLR$
+
+* $MSE: RF < MLR < IRLS$
+
+* $MRE: RF < MLR < IRLS$
+
+Like the heating model results, the RF model significantly outperforms the MLR and IRLS models in every metric. However, between the MLR and IRLS models, there is a slight but notable difference in the results for the cooling model.
+
+While the IRLS model achieves a slightly lower average MAE than the MLR model, it has a larger average MSE. This is an interesting result because of how errors are treated in each metric. MAE treats all errors linearly, while MSE penalizes larger errors due to squaring the residual value. This indicates that the MLR model has less extreme errors despite having a higher average error, making it more robust to outliers and new data. This clearly shows that properly selecting predictors outperforms simple learning methods meant to handle noise and outliers. 
+
+The cooling model results further verify the claim that for this dataset, RF is a superior method to MLR and IRLS for regression modeling and analysis. It is much more capable of capturing the non-linear relationships between variables.
+
+```{r cool-load-results, echo=FALSE}
+tt(cool_df) %>%
+  # Group columns under "Heat Load" and "Cool Load" headers
+  group_tt(j = list("Model MAE, MSE, and MRE" = 2:4)) %>%
+  # Rename the columns to just show the model names (removing the _Heat/_Cool suffix)
+  style_tt(i = 0, j = 2:4, text = rep(c("MLR", "IRLS", "RF"), 2)) %>%
+  # Center align all columns
+  style_tt(j = 1:4, align = "c")
+```
+
+### Importance of Variables
+The table shows the importance of each predictor for a given response variable determined via RF. For the MLR model, the "importance" is the magnitude of the standardized coefficients. For a better understanding of how RF determines variable importance, we recommend reviewing the literature [@strobl2007bias]. 
+
+For both models, a larger magnitude for a given predictor indicates a larger impact on the response variable. The values for each model are not on the same scale. The ranking of variable importance is denoted in the parenthesis next to each variables importance value, where 1 is the most important.
+
+The heating and cooling load RF models have similar orders of importance, but the cooling load model found glazing area distribution and orientation to be more important than its heating load counterpart. The heating and cooling load MLR models have the same order of importance for the predictors they have in common.
+
+The heating load model has glazing area distribution area as an additional predictor, but it has the smallest magnitude of all the standardized coefficients. Interestingly, the RF model found that roof area and orientation were two of the least important predictors in both models, both of which were removed as predictors from the MLR models. 
+
+The MLR cooling load model also removed glazing area distribution as a predictor, which the RF cooling load model found to have moderate relative importance. However, both RF models found glazing area to be the most important predictor, while both MLR models found it to be one of the least important variables used. 
+
+The MLR models also significantly overvalued overall height as a predictor in both models. Both RF models found it to be the least important variable. These results point to the same conclusion from the original work: classical regression analysis is not capable of capturing the complex, non-linear relationships in this dataset.
+
+```{r pred-importance, echo=FALSE}
+# Function to format mean and sd into a string "Mean ± SD" including importance rank
+fmt_imp <- function(data_vec) {
+  N <- length(data_vec$Means) # number of fields
+  means <- data_vec$Means # get the means
+  sorted_order <- order(as.vector(means), decreasing = TRUE) # sorted based on average values (large to small)
+  
+  # Create string field for each variable
+  data_vec$res_string <- vector(mode = "character", length = N)
+  for (i in 1:N) {
+    data_vec$res_string[i] <- sprintf("%.2f \u00B1 %.2f (%d)", data_vec$Means[i],
+                                  data_vec$Sigmas[i], which(sorted_order == i))
+  }
+  
+  # Return updated dataframe
+  return(data_vec)
+}
+
+# Create the RF string using the results reported by the paper
+heat_importance_RF <- c("50.51 \u00B1 1.15 (2)",
+             "50.41 \u00B1 1.41 (3)",
+             "40.16 \u00B1 1.09 (4)",
+             "20.40 \u00B1 0.95 (6)",
+             "8.97 \u00B1 0.68 (8)",
+             "18.51 \u00B1 0.44 (7)",
+             "93.12 \u00B1 1.50 (1)",
+             "38.84 \u00B1 0.94 (5)")
+
+cool_importance_RF <- c("43.74 \u00B1 1.11 (2)",
+             "43.55 \u00B1 1.08 (3)",
+             "32.16 \u00B1 0.83 (5)",
+             "20.12 \u00B1 0.87 (7)",
+             "9.41 \u00B1 0.72 (8)",
+             "22.03 \u00B1 0.48 (6)",
+             "86.92 \u00B1 1.58 (1)",
+             "39.07 \u00B1 0.97 (4)")
+
+# Get the MLR heat models variable order of importance
+heat_vars <- c("relative_compactness", "surface_area", "wall_area",
+               "overall_height", "glazing_area", "glazing_area_dist")
+heat_means <- c(mean(heat_coeff$relative_compactness), mean(heat_coeff$surface_area), mean(heat_coeff$wall_area),
+                mean(heat_coeff$overall_height), mean(heat_coeff$glazing_area), mean(heat_coeff$glazing_area_dist))
+heat_sigs <- c(sd(heat_coeff$relative_compactness), sd(heat_coeff$surface_area), sd(heat_coeff$wall_area),
+               sd(heat_coeff$overall_height), sd(heat_coeff$glazing_area), sd(heat_coeff$glazing_area_dist))
+
+heat_coeff_data <- data.frame(
+  Means = heat_means,
+  Sigmas = heat_sigs,
+  Name = heat_vars
+)
+
+heat_coeff_data <- fmt_imp(heat_coeff_data)
+heat_importance_MLR <- c(heat_coeff_data$res_string[1],
+                        heat_coeff_data$res_string[2],
+                        heat_coeff_data$res_string[3],
+                        "NA", # roof_area
+                        heat_coeff_data$res_string[4],
+                        "NA", # orientation
+                        heat_coeff_data$res_string[5],
+                        heat_coeff_data$res_string[6])
+
+# Get the MLR cool models variable order of importance
+
+cool_vars <- c("relative_compactness", "surface_area", "wall_area",
+               "overall_height", "glazing_area", "glazing_area_dist")
+cool_means <- c(mean(cool_coeff$relative_compactness), mean(cool_coeff$surface_area), mean(cool_coeff$wall_area),
+                mean(cool_coeff$overall_height), mean(cool_coeff$glazing_area), mean(cool_coeff$glazing_area_dist))
+cool_sigs <- c(sd(cool_coeff$relative_compactness), sd(cool_coeff$surface_area), sd(cool_coeff$wall_area),
+               sd(cool_coeff$overall_height), sd(cool_coeff$glazing_area), sd(cool_coeff$glazing_area_dist))
+
+cool_coeff_data <- data.frame(
+  Means = cool_means,
+  Sigmas = cool_sigs,
+  Name = cool_vars
+)
+
+cool_coeff_data <- fmt_imp(cool_coeff_data)
+cool_importance_MLR <- c(cool_coeff_data$res_string[1],
+                        cool_coeff_data$res_string[2],
+                        cool_coeff_data$res_string[3],
+                        "NA", # roof_area
+                        cool_coeff_data$res_string[4],
+                        "NA", # orientation
+                        cool_coeff_data$res_string[5],
+                        "NA") # glazing_area_dist
+
+# Create new data frames for the heat and cool load results
+importance_df <- data.frame(
+  Measure = c("relative_compactness", "surface_area", "wall_area", "roof_area",
+             "overall_height", "orientation", "glazing_area", "glazing_are_dist"),
+  
+  # Heat load columns
+  `RF Importance for Heating Load` = heat_importance_RF,
+  `MLR Importance for Heating Load` = heat_importance_MLR,
+  
+  # Cool load columns
+  `RF Importance for Cooling Load` = cool_importance_RF,
+  `MLR Importance for Cooling Load` = cool_importance_MLR
+)
+
+names(importance_df) <- c("Measure", "RF - Heating", "MLR - Heating",
+                          "RF - Cooling", "MLR - Cooling")
+
+# Table showing importance of input variables as determined by RF for the output variables (from original paper)
+tt(importance_df) %>%
+  # Center align all columns
+  style_tt(j = 1:5, align = "c")
+```
+
+Summary
+===
+
+Column {data-width=650}
+---
+
+### Final Model Interpretations {data-height=300}
+Given the final MLR heating and cooling load estimated standardized coefficients, the estimated models can be written as follows:
+
+* $\hat{Heat \space Load} = 6.85(\textit{relative compactness}) + 7.69(\textit{surface area}) + 2.65(\textit{wall area}) + 7.30(\textit{overall height}) + 2.66(\textit{glazing area}) + 0.32(\textit{glazing area distribution})$
+
+* $\hat{Cool \space Load} = 7.49(\textit{relative compactness}) + 7.78(\textit{surface area}) + 1.95(\textit{wall area}) + 7.50(\textit{overall height}) + 1.97(\textit{glazing area})$
+
+Since only the predictors were standardized, interpretation is as follows, within model context. Relative compactness from the heating load model is used here as an example: for every one-standard-deviation change in relative compactness, the expected change in heat load is 6.85 units, holding all other variables constant.
+
+### Conclusion {data-height=700}
+In this project, we perform 10-fold CV of a publicly available dataset from simulated EPB data. Previous work [@tsanas2012accurate] explored the use of IRLS and RF to model heating and cooling loads given 8 predictors, claiming that classical regression analysis was insufficient for capturing the complex nature of the relationships between variables. This work explored that claim by going through a model selection process that removed insignificant predictors from the heating and cooling load models when using the full dataset. 10-fold CV testing was conducted 100 times to replicate the experiment in the original work, providing MAE, MSE, and MRE metrics for direct comparison to the published IRLS and RF results. 
+
+We found that while RF was superior to the MLR models in this work, proper variable selection for the MLR models actually resulted in better performance than the IRLS models. Since IRLS is designed specifically for optimizing regression model coefficients and to handle outliers, this is a significant result. It shows that while RF is still superior for better capturing highly non-linear relationships, finely selecting the best predictors for classical regression analysis is better than simply using all variables and using IRLS in an attempt to optimize the model.
+
+It is important to note that all of the results from this project, and the published work, is unlikely to generalize well in the real world. The size of the dataset alone (768 observations) is not enough to generalize to cities, nations, or the world. In addition, all of the buildings in this $\textit{simulated}$ dataset had very specific constraints, including:
+
+* Identical build quality and materials
+
+* Same number of residents per building (7)
+
+* All buildings were located in Athens, Greece
+
+* All buildings used a fixed activity rate of 70 Watts
+
+However, the dataset is sufficient for comparing estimated models using different methods. This is important when it comes to real-world data, as the results from this work, the published work, and any prior work, guide intuitions and decisions made when it comes to real-world analysis.
+
+Column {data-width=350}
+---
+
+### Author Information
+Eric Smith is a PhD student in the department of Electrical and Computer Engineering at the University of Dayton. He holds a B.S. in Physics from the Ohio State University and M.S. in Electro-Optics from the University of Dayton. He works full-time for a small defense contractor in Beavercreek, Ohio, specializing in directed energy and atmospheric simulation, modeling, and measurement. His research interests broadly include computer vision problems involving object detection and tracking, with his most recent work focused on a modular algorithm for small drone detection and tracking.
+
+### References
+<div id="refs"></div>
+
+### Disclaimers
+ChatGPT, Google AI Overview, and Google Gemini were used to help with general code problems, like syntax, as well as determining necessary libraries and how to use their functions in R. Google Gemini was used to generate the IRLS flowchart and RF illustration in Figures [2](#IRLS-Flowchart) and [3](#RF-illustration), respectively.
