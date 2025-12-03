@@ -25,7 +25,7 @@ window.FlexDashboardComponents = [];
 <script id="flexdashboard-navbar" type="application/json">
 [{"title":"Source Code","icon":"fa-code","href":"source_embed","align":"right"}]
 </script>
-<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.30/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 <link href="site_libs/bootstrap-4.6.0/bootstrap.min.css" rel="stylesheet" />
@@ -1874,9 +1874,9 @@ body{ /* Normal  */
 </head>
 <div id="project-overview" class="section level1">
 <h1>Project Overview</h1>
-<div id="column" class="section level2" data-width="650">
+<div id="column" class="section level2" data-width="300">
 <h2>Column</h2>
-<div id="goal" class="section level3" data-height="35">
+<div id="goal" class="section level3" data-height="28">
 <h3>Goal</h3>
 <div class="knitr-options" data-fig-width="576" data-fig-height="460">
 
@@ -1887,11 +1887,9 @@ specifically heat load and cool load. The dataset used in this work is a
 publicaly available simulated dataset found in the UC Irvine Machine
 Learning Repository (<a
 href="https://archive.ics.uci.edu/dataset/242/energy+efficiency">dataset
-link</a>). In this particular dataset, there are 12 different building
-shapes, differing with respect to the glazing area, glazing area
-distribution, and orientation, as well as some other variables.</p>
+link</a>).</p>
 </div>
-<div id="dataset-overview" class="section level3" data-height="30">
+<div id="dataset-overview" class="section level3" data-height="28">
 <h3>Dataset Overview</h3>
 <p>In total, there are 768 observations (buildings). There are 8
 predictor variables and 2 response variables. Figure <a
@@ -1903,7 +1901,7 @@ effect of eight input variables on determining two output variables. The
 possible values.</p>
 </div>
 <div id="simulated-building-information" class="section level3"
-data-height="70">
+data-height="35">
 <h3>Simulated Building Information</h3>
 <p>There are 12 simulated building forms in total, composed of 18
 “elements.” The following assumptions are made for all buildings:</p>
@@ -1913,19 +1911,23 @@ with 7 residents</p></li>
 <li><p>Fixed activity of 70 Watts</p></li>
 <li><p>All internal and thermal properties are the same</p></li>
 <li><p><span class="math inline">\((12 \text{ building forms } \times 3
-\text{ glazing area variations } \times 5 \text{ glazing area
-distributions } \times 4 \text{ orientations }) + (12 \text{ building
-forms } \times 4 \text{ orientations w/o glazing}) = 768 \text{
+\text{ glazing area variations } \newline \times 5 \text{ glazing area
+distributions } \times 4 \text{ orientations }) + \newline (12 \text{
+building forms } \times 4 \text{ orientations w/o glazing}) = 768 \text{
 buildings}\)</span></p></li>
 </ul>
 </div>
-<div id="project-focus" class="section level3" data-height="90">
+</div>
+<div id="column-1" class="section level2" data-width="225">
+<h2>Column</h2>
+<div id="project-focus" class="section level3">
 <h3>Project Focus</h3>
 <p>This project focuses on a specific claim made in the original work:
 classical regression analysis is insufficient for modeling with this
 dataset, hence favoring IRLS and RF. This final project aims to verify
-the claim. The end goal is to determine if the claim is true, and if so,
-how much better is IRLS and RF than classical regression analysis and
+the claim.</p>
+<p>The end goal is to determine if the claim is true, and if so, how
+much better is IRLS and RF than classical regression analysis and
 modeling? This will be done by comparing the provided mean absolute
 error (MAE), mean square error (MSE), and mean relative error (MRE)
 values in the original work and comparing it with those found in this
@@ -1933,19 +1935,20 @@ project.</p>
 <p>The first step is perform exploratory data analysis (EDA). Then, the
 best set of variables to use for modeling heating and cooling loads will
 be found using several processes. This will be done using the entire
-dataset. Once the variables for each model have been chosen, the same
+dataset.</p>
+<p>Once the variables for each model have been chosen, the same
 experiment conducted in the original work to determine the MAE, MSE, and
 MRE of the IRLS and RF models will be performed. This involves many
 repetitions of shuffling the dataset, creating training and testing
 splits, fitting models, and measuring errors. This will be discussed in
 further detail in the “Model Analysis” section.</p>
-<p>Before EDA, we perform a brief introduction of IRLS and RF to better
-understand how each works. This is done in the “Background” section.</p>
+<p>Before EDA, we briefly introduce IRLS and RF to better understand how
+each works.</p>
 </div>
 </div>
-<div id="column-1" class="section level2" data-width="350">
+<div id="column-2" class="section level2" data-width="300">
 <h2>Column</h2>
-<div id="introduction-plot" class="section level3" data-height="54">
+<div id="introduction-plot" class="section level3" data-height="43">
 <h3>Introduction Plot</h3>
 <!-- Figure 1 -->
 <a name="intro-plot"></a>
@@ -1954,7 +1957,7 @@ understand how each works. This is done in the “Background” section.</p>
 </div>
 <p><img src="index_files/figure-html/intro-plot-1.png" width="864" data-figure-id=fig1 /></p>
 </div>
-<div id="dataset-variables" class="section level3" data-height="46">
+<div id="dataset-variables" class="section level3" data-height="50">
 <h3>Dataset Variables</h3>
 <div class="knitr-options" data-fig-width="576" data-fig-height="460">
 
@@ -2030,19 +2033,19 @@ understand how each works. This is done in the “Background” section.</p>
 </div>
 <div id="background" class="section level1">
 <h1>Background</h1>
-<div id="column-2" class="section level2" data-width="600">
+<div id="column-3" class="section level2" data-width="600">
 <h2>Column</h2>
 <div id="overview" class="section level3" data-height="70">
 <h3>Overview</h3>
-<p>In the original work <span class="citation">(Tsanas and Xifara
+<p>In the original work <span class="citation">(Tsanas &amp; Xifara,
 2012)</span>, statistical machine learning methods are used to train and
 test models on the dataset to predict heat and cool loads given all
 predictors. The reason for investigating statistical machine learning
 for this specific problem is that classical least squares regression
 techniques is unable to sufficiently model and capture the non-linear
 nature of the problem. Two methods are explored in the original work:
-iteratively reweighted least squares (IRLS) and random forest (RF).</p>
-<p>In addition, we briefly discuss why Spearman rank correlation is used
+iteratively reweighted least squares (IRLS) and random forest (RF). In
+addition, we briefly discuss why Spearman rank correlation is used
 instead of Pearson correlation.</p>
 </div>
 <div id="iteratively-reweighted-least-squares-irls"
@@ -2052,50 +2055,44 @@ class="section level3" data-height="75">
 works by adjusting the weights of a regression models coefficients to
 reduce the impact of outliers in data. This ultimately leads to an
 improved least squares estimate and overall model fit. More information
-on IRLS can be found in literature <span class="citation">(Bishop and
-Nasrabadi 2006; Tsanas et al. 2009)</span>. However, in applications
-where residuals do not follow a Gaussian distribution, IRLS can struggle
-to sufficiently model complex relationships. For this reason, RF is also
-used for regression analysis with this dataset.</p>
-<p>A basic flowchart of IRLS is shown in Figure <a
+on IRLS can be found in literature <span class="citation">(Bishop &amp;
+Nasrabadi, 2006; Tsanas, Little, McSharry, &amp; Ramig, 2009)</span>.
+However, in applications where residuals do not follow a Gaussian
+distribution, IRLS can struggle to sufficiently model complex
+relationships. A basic flowchart of IRLS is shown in Figure <a
 href="#IRLS-flowchart">2</a>. The flowchart was generated using Google
 Gemini.</p>
 </div>
-<div id="random-forst-rf" class="section level3" data-height="95">
+<div id="random-forst-rf" class="section level3" data-height="90">
 <h3>Random Forst (RF)</h3>
 <p>RF is an extension of the classification and regression tree (CART).
 CART is a nonlinear method designed for classification and regression
-analysis. When response variables are categorical, it serves as a
-classification model. It can also be used to build regression trees when
-predictors are continuous, numeric values.</p>
-<p>The concept of CART is to repeatedly split an input feature space
-(predictors) into smaller sub-regions. The feature space is iteratively
-split into smaller and smaller sub-regions until it is not possible to
-split it any more, or some criterion to stop splitting has been met. RF
-is a collection of many “trees,” or a collection of CART models. To
-obtain this collection of models, a random subset of the variables are
-chosen for each model, and then the CART procedure is performed for each
-tree.</p>
-<p>A simple illustration of RF is shown in Figure <a
+analysis. The concept of CART is to repeatedly split an input feature
+space (predictors) into smaller sub-regions. The feature space is
+iteratively split into smaller and smaller sub-regions until it is not
+possible to split it any more, or some criterion to stop splitting has
+been met. RF is a collection of many “trees.” A random subset of the
+data is chosen for each tree, and then the CART procedure is performed.
+A simple illustration of RF is shown in Figure <a
 href="#RF-illustration">3</a>. The illustration was generated using
 Google Gemini.</p>
+<!-- When response variables are categorical, it serves as a classification model. It can also be used to build regression trees when predictors are continuous, numeric values.  -->
 </div>
 <div id="spearman-rank-correlation" class="section level3"
-data-height="95">
+data-height="75">
 <h3>Spearman Rank Correlation</h3>
 <p>Spearman rank correlation is used instead of the Pearson correlation
 since that is what the original work chose to do. This decision was made
 because most of the predictors have non-Gaussian distributions and
 non-linear relationships. This method determines how well the
 relationship between two variables can be described using a monotonic
-function.</p>
+function. The coefficient value is between -1 and 1, where a negative
+value indicates an inversely proportional relatinship and a positive
+value indicates a proportional relationship.</p>
 <!-- This method determines how well the relationship between two variables can be described using a monotonic function, i.e. a function that only ever increases or decreases, but not necessarily at a constant rate. Instead of using the raw data, each variable is converted into a set of ranks. The ranks of two variables are used to determine the correlation coefficient.  -->
-<p>The coefficient value is between -1 and 1, where a negative value
-indicates an inversely proportional relatinship and a positive value
-indicates a proportional relationship.</p>
 </div>
 </div>
-<div id="column-3" class="section level2" data-width="400">
+<div id="column-4" class="section level2" data-width="400">
 <h2>Column</h2>
 <div id="irls-flowchart" class="section level3" data-height="400">
 <h3>IRLS Flowchart</h3>
@@ -2119,7 +2116,7 @@ indicates a proportional relationship.</p>
 </div>
 <div id="eda" class="section level1">
 <h1>EDA</h1>
-<div id="column-4" class="section level2" data-width="375">
+<div id="column-5" class="section level2" data-width="375">
 <h2>Column</h2>
 <div id="investigating-the-data" class="section level3">
 <h3>Investigating the Data</h3>
@@ -2134,7 +2131,7 @@ response variables</p></li>
 </ul>
 </div>
 </div>
-<div id="column-5" class="section level2 tabset" data-width="625">
+<div id="column-6" class="section level2 tabset" data-width="625">
 <h2 class="tabset">Column</h2>
 <div id="scatterplots" class="section level3">
 <h3>Scatterplots</h3>
@@ -2282,7 +2279,7 @@ load as well.</p>
 </div>
 <div id="model-selection" class="section level1">
 <h1>Model Selection</h1>
-<div id="column-6" class="section level2" data-width="300">
+<div id="column-7" class="section level2" data-width="300">
 <h2>Column</h2>
 <div id="procedure" class="section level3">
 <h3>Procedure</h3>
@@ -2312,16 +2309,11 @@ work. Model summary tables show the coefficient estimates and their
 significance level.</p>
 </div>
 </div>
-<div id="column-7" class="section level2 tabset" data-width="700">
+<div id="column-8" class="section level2 tabset" data-width="700">
 <h2 class="tabset">Column</h2>
 <div id="heat-load-models" class="section level3">
 <h3>Heat Load Models</h3>
-<p>For the heating load model, the backward, stepwise, and best subset
-selection processes produced the same model. The forward selection
-process provided a model with an additional predictor, very slightly
-reducing its adjusted <span class="math inline">\(R^2\)</span>. For that
-reason, we go with the model selected from the other three process. The
-predictors that will be used for modeling heating load are:</p>
+<p>The predictors that will be used for modeling heating load are:</p>
 <ul>
 <li><p>Relative compactness</p></li>
 <li><p>Surface area</p></li>
@@ -2334,7 +2326,6 @@ predictors that will be used for modeling heating load are:</p>
 
 </div>
 <table style="width:97%;">
-<caption>Heat Load Model Regression Results</caption>
 <colgroup>
 <col width="24%" />
 <col width="18%" />
@@ -2448,12 +2439,7 @@ predictors that will be used for modeling heating load are:</p>
 </div>
 <div id="cool-load-models" class="section level3">
 <h3>Cool Load Models</h3>
-<p>For the cooling load model, all four processes resulted in nearly
-identical adjusted <span class="math inline">\(R^2\)</span> values. The
-forward selection model produced a very slightly reduced RMSE at the
-expense of including an additional predictor. We choose the less complex
-model that achieves nearly identical performance. The predictors that
-will be used for modeling cooling load are:</p>
+<p>The predictors that will be used for modeling cooling load are:</p>
 <ul>
 <li><p>Relative compactness</p></li>
 <li><p>Surface area</p></li>
@@ -2461,13 +2447,10 @@ will be used for modeling cooling load are:</p>
 <li><p>Overall height</p></li>
 <li><p>Glazing area</p></li>
 </ul>
-<p>These are the same predictors used as the heating load model, minus
-glazing area distribution.</p>
 <div class="knitr-options" data-fig-width="576" data-fig-height="460">
 
 </div>
 <table style="width:97%;">
-<caption>Cool Load Model Regression Results</caption>
 <colgroup>
 <col width="24%" />
 <col width="18%" />
@@ -2583,7 +2566,7 @@ glazing area distribution.</p>
 </div>
 <div id="model-analysis" class="section level1">
 <h1>Model Analysis</h1>
-<div id="column-8" class="section level2" data-width="500">
+<div id="column-9" class="section level2" data-width="500">
 <h2>Column</h2>
 <div id="cross-validation-procedure" class="section level3">
 <h3>Cross-Validation Procedure</h3>
@@ -2631,13 +2614,13 @@ class="math inline">\(K = 10\)</span> and 100 repetitions. The reported
 MAE, MSE, and MRE values are the average values of all the measurements,
 plus or minus one standard deviation. The reported errors for the IRLS
 and RF models come directly from the original work <span
-class="citation">(Tsanas and Xifara 2012)</span>.</p>
+class="citation">(Tsanas &amp; Xifara, 2012)</span>.</p>
 <div class="knitr-options" data-fig-width="576" data-fig-height="460">
 
 </div>
 </div>
 </div>
-<div id="column-9" class="section level2 tabset" data-width="500">
+<div id="column-10" class="section level2 tabset" data-width="500">
 <h2 class="tabset">Column</h2>
 <div id="heating-load-model-results" class="section level3">
 <h3>Heating Load Model Results</h3>
@@ -2781,7 +2764,8 @@ relationships between variables.</p>
 variable determined via RF. For the MLR model, the “importance” is the
 magnitude of the standardized coefficients. For a better understanding
 of how RF determines variable importance, we recommend reviewing the
-literature <span class="citation">(Strobl et al. 2007)</span>.</p>
+literature <span class="citation">(Strobl, Boulesteix, Zeileis, &amp;
+Hothorn, 2007)</span>.</p>
 <p>For both models, a larger magnitude for a given predictor indicates a
 larger impact on the response variable. The values for each model are
 not on the same scale. The ranking of variable importance is denoted in
@@ -2892,7 +2876,7 @@ the complex, non-linear relationships in this dataset.</p>
 </div>
 <div id="summary" class="section level1">
 <h1>Summary</h1>
-<div id="column-10" class="section level2" data-width="650">
+<div id="column-11" class="section level2" data-width="650">
 <h2>Column</h2>
 <div id="final-model-interpretations" class="section level3"
 data-height="300">
@@ -2920,7 +2904,7 @@ units, holding all other variables constant.</p>
 <h3>Conclusion</h3>
 <p>In this project, we perform 10-fold CV of a publicly available
 dataset from simulated EPB data. Previous work <span
-class="citation">(Tsanas and Xifara 2012)</span> explored the use of
+class="citation">(Tsanas &amp; Xifara, 2012)</span> explored the use of
 IRLS and RF to model heating and cooling loads given 8 predictors,
 claiming that classical regression analysis was insufficient for
 capturing the complex nature of the relationships between variables.
@@ -2959,7 +2943,7 @@ work, guide intuitions and decisions made when it comes to real-world
 analysis.</p>
 </div>
 </div>
-<div id="column-11" class="section level2" data-width="350">
+<div id="column-12" class="section level2" data-width="350">
 <h2>Column</h2>
 <div id="author-information" class="section level3">
 <h3>Author Information</h3>
@@ -2975,25 +2959,26 @@ algorithm for small drone detection and tracking.</p>
 </div>
 <div id="references" class="section level3">
 <h3>References</h3>
-<div id="refs" class="references csl-bib-body" entry-spacing="0">
+<div id="refs" class="references csl-bib-body hanging-indent"
+entry-spacing="0" line-spacing="2">
 <div id="ref-bishop2006pattern" class="csl-entry">
-Bishop, C.M., Nasrabadi, N.M.: Pattern recognition and machine learning.
-Springer (2006)
+Bishop, C. M., &amp; Nasrabadi, N. M. (2006). <em>Pattern recognition
+and machine learning</em> (Vol. 4). Springer.
 </div>
 <div id="ref-strobl2007bias" class="csl-entry">
-Strobl, C., Boulesteix, A.-L., Zeileis, A., Hothorn, T.: Bias in random
-forest variable importance measures: Illustrations, sources and a
-solution. BMC bioinformatics. 8, 25 (2007)
+Strobl, C., Boulesteix, A.-L., Zeileis, A., &amp; Hothorn, T. (2007).
+Bias in random forest variable importance measures: Illustrations,
+sources and a solution. <em>BMC Bioinformatics</em>, <em>8</em>(1), 25.
 </div>
 <div id="ref-tsanas2009accurate" class="csl-entry">
-Tsanas, A., Little, M., McSharry, P., Ramig, L.: Accurate telemonitoring
-of parkinson’s disease progression by non-invasive speech tests. Nature
-Precedings. 1–1 (2009)
+Tsanas, A., Little, M., McSharry, P., &amp; Ramig, L. (2009). Accurate
+telemonitoring of parkinson’s disease progression by non-invasive speech
+tests. <em>Nature Precedings</em>, 1–1.
 </div>
 <div id="ref-tsanas2012accurate" class="csl-entry">
-Tsanas, A., Xifara, A.: Accurate quantitative estimation of energy
-performance of residential buildings using statistical machine learning
-tools. Energy and buildings. 49, 560–567 (2012)
+Tsanas, A., &amp; Xifara, A. (2012). Accurate quantitative estimation of
+energy performance of residential buildings using statistical machine
+learning tools. <em>Energy and Buildings</em>, <em>49</em>, 560–567.
 </div>
 </div>
 </div>
@@ -3044,7 +3029,8 @@ output:
     # vertical_layout: scroll
     source_code: embed
 bibliography: references.bib
-csl: asta-advances-in-statistical-analysis.csl
+# csl: asta-advances-in-statistical-analysis.csl
+csl: apa-6th-edition.csl
 ---
 
 &lt;style&gt;
@@ -3068,10 +3054,10 @@ library(flexdashboard)
 Project Overview
 ===
 
-Column {data-width=650}
+Column {data-width=300}
 ---
 
-### Goal {data-height=35}
+### Goal {data-height=28}
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 rm(list = ls()) # clears global workspace to start fresh
 library(pacman)
@@ -3079,18 +3065,18 @@ pacman::p_load(rstudioapi, DataExplorer, modelsummary, readxl, caret,
                corrplot, MASS, leaps, tidymodels, tinytable, dplyr, gt, tibble)
 
 # Set the working directory to this files location
-# script_path &lt;- rstudioapi::getActiveDocumentContext()$path
-# script_dir &lt;- dirname(script_path)
-# setwd(script_dir)
-setwd("E:/School/PhD/Classes/MTH543/FinalProject/MTH-543-Final-Project")
+script_path &lt;- rstudioapi::getActiveDocumentContext()$path
+script_dir &lt;- dirname(script_path)
+setwd(script_dir)
+# setwd("E:/School/PhD/Classes/MTH543/FinalProject/MTH-543-Final-Project")
 ```
-In this final project, we perform regression analysis using building specifications to estimate energy performance of buildings (EPB), specifically heat load and cool load. The dataset used in this work is a publicaly available simulated dataset found in the UC Irvine Machine Learning Repository ([dataset link](https://archive.ics.uci.edu/dataset/242/energy+efficiency)). In this particular dataset, there are 12 different building shapes, differing with respect to the glazing area, glazing area distribution, and orientation, as well as some other variables.
+In this final project, we perform regression analysis using building specifications to estimate energy performance of buildings (EPB), specifically heat load and cool load. The dataset used in this work is a publicaly available simulated dataset found in the UC Irvine Machine Learning Repository ([dataset link](https://archive.ics.uci.edu/dataset/242/energy+efficiency)).
 
-### Dataset Overview {data-height=30}
+### Dataset Overview {data-height=28}
 In total, there are 768 observations (buildings). There are 8 predictor variables and 2 response variables. Figure [1](#intro-plot) shows a basic summary of the full dataset. From this plot, we find that the entire dataset is clean with no missing data. This is a simulated dataset that was created to investigate the effect of eight input variables on determining two output variables. The "Dataset Variables" table shows the variable names and number of possible values.
 
 
-### Simulated Building Information {data-height=70}
+### Simulated Building Information {data-height=35}
 There are 12 simulated building forms in total, composed of 18 "elements." The following assumptions are made for all buildings:
 
 * Location and occupants: Residential building in Athens, Greece, with 7 residents
@@ -3099,19 +3085,26 @@ There are 12 simulated building forms in total, composed of 18 "elements." The f
 
 * All internal and thermal properties are the same
 
-* $(12 \text{ building forms } \times 3 \text{ glazing area variations } \times 5 \text{ glazing area distributions } \times 4 \text{ orientations }) + (12 \text{ building forms } \times 4 \text{ orientations w/o glazing}) = 768 \text{ buildings}$
+* $(12 \text{ building forms } \times 3 \text{ glazing area variations } \newline \times 5 \text{ glazing area distributions } \times 4 \text{ orientations }) + \newline (12 \text{ building forms } \times 4 \text{ orientations w/o glazing}) = 768 \text{ buildings}$
 
-### Project Focus {data-height=90}
-This project focuses on a specific claim made in the original work: classical regression analysis is insufficient for modeling with this dataset, hence favoring IRLS and RF. This final project aims to verify the claim. The end goal is to determine if the claim is true, and if so, how much better is IRLS and RF than classical regression analysis and modeling? This will be done by comparing the provided mean absolute error (MAE), mean square error (MSE), and mean relative error (MRE) values in the original work and comparing it with those found in this project. 
-
-The first step is perform exploratory data analysis (EDA). Then, the best set of variables to use for modeling heating and cooling loads will be found using several processes. This will be done using the entire dataset. Once the variables for each model have been chosen, the same experiment conducted in the original work to determine the  MAE, MSE, and MRE of the IRLS and RF models will be performed. This involves many repetitions of shuffling the dataset, creating training and testing splits, fitting models, and measuring errors. This will be discussed in further detail in the "Model Analysis" section. 
-
-Before EDA, we perform a brief introduction of IRLS and RF to better understand how each works. This is done in the "Background" section.
-
-Column {data-width=350}
+Column {data-width=225}
 ---
 
-### Introduction Plot {data-height=54}
+### Project Focus
+This project focuses on a specific claim made in the original work: classical regression analysis is insufficient for modeling with this dataset, hence favoring IRLS and RF. This final project aims to verify the claim.
+
+The end goal is to determine if the claim is true, and if so, how much better is IRLS and RF than classical regression analysis and modeling? This will be done by comparing the provided mean absolute error (MAE), mean square error (MSE), and mean relative error (MRE) values in the original work and comparing it with those found in this project. 
+
+The first step is perform exploratory data analysis (EDA). Then, the best set of variables to use for modeling heating and cooling loads will be found using several processes. This will be done using the entire dataset. 
+
+Once the variables for each model have been chosen, the same experiment conducted in the original work to determine the  MAE, MSE, and MRE of the IRLS and RF models will be performed. This involves many repetitions of shuffling the dataset, creating training and testing splits, fitting models, and measuring errors. This will be discussed in further detail in the "Model Analysis" section. 
+
+Before EDA, we briefly introduce IRLS and RF to better understand how each works.
+
+Column {data-width=300}
+---
+
+### Introduction Plot {data-height=43}
 &lt;!-- Figure 1 --&gt;
 &lt;a name="intro-plot"&gt;&lt;/a&gt;
 ```{r intro-plot, echo=FALSE, fig.width=9}
@@ -3127,7 +3120,7 @@ df &lt;- df %&gt;% rename(relative_compactness = X1, surface_area = X2,
 plot_intro(df) # visualize basic information about the full dataset
 ```
 
-### Dataset Variables {data-height=46}
+### Dataset Variables {data-height=50}
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 # Define the variable information
 vars &lt;- c("X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "Y1", "Y2")
@@ -3159,28 +3152,20 @@ Column {data-width=600}
 ---
 
 ### Overview {data-height=70}
-In the original work [@tsanas2012accurate], statistical machine learning methods are used to train and test models on the dataset to predict heat and cool loads given all predictors. The reason for investigating statistical machine learning for this specific problem is that classical least squares regression techniques is unable to sufficiently model and capture the non-linear nature of the problem. Two methods are explored in the original work: iteratively reweighted least squares (IRLS) and random forest (RF).
-
-In addition, we briefly discuss why Spearman rank correlation is used instead of Pearson correlation.
+In the original work [@tsanas2012accurate], statistical machine learning methods are used to train and test models on the dataset to predict heat and cool loads given all predictors. The reason for investigating statistical machine learning for this specific problem is that classical least squares regression techniques is unable to sufficiently model and capture the non-linear nature of the problem. Two methods are explored in the original work: iteratively reweighted least squares (IRLS) and random forest (RF). In addition, we briefly discuss why Spearman rank correlation is used instead of Pearson correlation.
 
 ### Iteratively Reweighted Least Squares (IRLS) {data-height=75}
-IRLS is simpler than RF and is a commonly used regression method. It works by adjusting the weights of a regression models coefficients to reduce the impact of outliers in data. This ultimately leads to an improved least squares estimate and overall model fit. More information on IRLS can be found in literature [@bishop2006pattern; @tsanas2009accurate]. However, in applications where residuals do not follow a Gaussian distribution, IRLS can struggle to sufficiently model complex relationships. For this reason, RF is also used for regression analysis with this dataset.
+IRLS is simpler than RF and is a commonly used regression method. It works by adjusting the weights of a regression models coefficients to reduce the impact of outliers in data. This ultimately leads to an improved least squares estimate and overall model fit. More information on IRLS can be found in literature [@bishop2006pattern; @tsanas2009accurate]. However, in applications where residuals do not follow a Gaussian distribution, IRLS can struggle to sufficiently model complex relationships. A basic flowchart of IRLS is shown in Figure [2](#IRLS-flowchart). The flowchart was generated using Google Gemini.
 
-A basic flowchart of IRLS is shown in Figure [2](#IRLS-flowchart). The flowchart was generated using Google Gemini.
+### Random Forst (RF) {data-height=90}
+RF is an extension of the classification and regression tree (CART). CART is a nonlinear method designed for classification and regression analysis. The concept of CART is to repeatedly split an input feature space (predictors) into smaller sub-regions. The feature space is iteratively split into smaller and smaller sub-regions until it is not possible to split it any more, or some criterion to stop splitting has been met. RF is a collection of many "trees." A random subset of the data is chosen for each tree, and then the CART procedure is performed. A simple illustration of RF is shown in Figure [3](#RF-illustration). The illustration was generated using Google Gemini.
 
-### Random Forst (RF) {data-height=95}
-RF is an extension of the classification and regression tree (CART). CART is a nonlinear method designed for classification and regression analysis. When response variables are categorical, it serves as a classification model. It can also be used to build regression trees when predictors are continuous, numeric values. 
+&lt;!-- When response variables are categorical, it serves as a classification model. It can also be used to build regression trees when predictors are continuous, numeric values.  --&gt;
 
-The concept of CART is to repeatedly split an input feature space (predictors) into smaller sub-regions. The feature space is iteratively split into smaller and smaller sub-regions until it is not possible to split it any more, or some criterion to stop splitting has been met. RF is a collection of many "trees," or a collection of CART models. To obtain this collection of models, a random subset of the variables are chosen for each model, and then the CART procedure is performed for each tree.
-
-A simple illustration of RF is shown in Figure [3](#RF-illustration). The illustration was generated using Google Gemini.
-
-### Spearman Rank Correlation {data-height=95}
-Spearman rank correlation is used instead of the Pearson correlation since that is what the original work chose to do. This decision was made because most of the predictors have non-Gaussian distributions and non-linear relationships. This method determines how well the relationship between two variables can be described using a monotonic function.
+### Spearman Rank Correlation {data-height=75}
+Spearman rank correlation is used instead of the Pearson correlation since that is what the original work chose to do. This decision was made because most of the predictors have non-Gaussian distributions and non-linear relationships. This method determines how well the relationship between two variables can be described using a monotonic function. The coefficient value is between -1 and 1, where a negative value indicates an inversely proportional relatinship and a positive value indicates a proportional relationship.
 
 &lt;!-- This method determines how well the relationship between two variables can be described using a monotonic function, i.e. a function that only ever increases or decreases, but not necessarily at a constant rate. Instead of using the raw data, each variable is converted into a set of ranks. The ranks of two variables are used to determine the correlation coefficient.  --&gt;
-
-The coefficient value is between -1 and 1, where a negative value indicates an inversely proportional relatinship and a positive value indicates a proportional relationship.
 
 Column {data-width=400}
 ---
@@ -3348,7 +3333,7 @@ Column {.tabset data-width=700}
 ---
 
 ### Heat Load Models
-For the heating load model, the backward, stepwise, and best subset selection processes produced the same model. The forward selection process provided a model with an additional predictor, very slightly reducing its adjusted $R^2$. For that reason, we go with the model selected from the other three process. The predictors that will be used for modeling heating load are:
+The predictors that will be used for modeling heating load are:
 
 * Relative compactness
 
@@ -3389,7 +3374,7 @@ ms_heat &lt;- modelsummary(
        "Stepwise Selection" = full_fit.heat_step, "Best Subset" = full_fit.heat_best),
   statistic = NULL,
   gof_map = c("r.squared", "adj.r.squared", "nobs", "rmse"),
-  title = "Heat Load Model Regression Results",
+  # title = "Heat Load Model Regression Results",
   escape = FALSE,
   stars = TRUE
 )
@@ -3398,7 +3383,7 @@ ms_heat %&gt;%
 ```
 
 ### Cool Load Models
-For the cooling load model, all four processes resulted in nearly identical adjusted $R^2$ values. The forward selection model produced a very slightly reduced RMSE at the expense of including an additional predictor. We choose the less complex model that achieves nearly identical performance. The predictors that will be used for modeling cooling load are:
+The predictors that will be used for modeling cooling load are:
 
 * Relative compactness
 
@@ -3409,8 +3394,6 @@ For the cooling load model, all four processes resulted in nearly identical adju
 * Overall height
 
 * Glazing area
-
-These are the same predictors used as the heating load model, minus glazing area distribution.
 
 ```{r cool-forward-model-summary, echo=FALSE, warning=FALSE, message=FALSE}
 full.cool_model &lt;- lm(cool_load ~ relative_compactness + surface_area + wall_area + roof_area +
@@ -3436,7 +3419,7 @@ ms_cool &lt;- modelsummary(
        "Stepwise Selection" = full_fit.cool_step, "Best Subset" = full_fit.cool_best),
   statistic = NULL,
   gof_map = c("r.squared", "adj.r.squared", "nobs", "rmse"),
-  title = "Cool Load Model Regression Results",
+  # title = "Cool Load Model Regression Results",
   escape = FALSE,
   stars = TRUE
 )
