@@ -3,24 +3,24 @@
     "path": "F:/School/PhD/Classes/MTH543/FinalProject/MTH-543-Final-Project/index.Rmd",
     "project_path": "index.Rmd",
     "type": "r_markdown",
-    "hash": "0",
+    "hash": "4164260479",
     "contents": "",
     "dirty": false,
     "created": 1764790003151.0,
-    "source_on_save": false,
+    "source_on_save": true,
     "relative_order": 1,
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "419,23",
-        "scrollLine": "397"
+        "cursorPosition": "874,590",
+        "scrollLine": "864"
     },
     "folds": "",
-    "lastKnownWriteTime": 1764793042,
+    "lastKnownWriteTime": 1764801306,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1764793041536,
+    "last_content_update": 1764801305842,
     "read_only": false,
     "read_only_alternatives": []
 }

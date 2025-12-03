@@ -174,7 +174,7 @@ knitr::include_graphics("./Figures/RF_Regression.png")
 EDA
 ===
 
-Column {data-width=375}
+Column {data-width=250}
 ---
 
 ### Investigating the Data
@@ -188,7 +188,7 @@ We begin with EDA of the full dataset. Discussion and conclusions and can be fou
 
 * Spearman rank correlation coefficients between predictors and response variables
 
-Column {.tabset data-width=625}
+Column {.tabset data-width=750}
 ---
 
 ### Scatterplots
@@ -202,7 +202,7 @@ The pairwise scatterplot shows scatterplots for all predictor and response varia
 
 Since heat load and cool load are not used as predictors of one another, this relationship is not very useful. This supports the claim made by the original work: classical regression may be insufficient for modeling the complex relationships in this data.
 
-```{r scatter-plots, fig.width=12, fig.height=5.76, fig.align='center', echo=FALSE}
+```{r scatter-plots, fig.width=10.5, fig.height=5, fig.align='center', echo=FALSE}
 oldpar <- par(no.readonly = TRUE)
 par(bg = "white")
 pairs(~heat_load + cool_load + relative_compactness + surface_area + wall_area + roof_area +
@@ -225,7 +225,7 @@ The predictor histograms show the following distributions found in the data:
 
 These distributions are intentional and to be expected due to the discrete nature of the data and the constraints around the simulated buildings discussed earlier.Note that there is no histogram shown for overall height. This is due to the discreteness of the data. There are only two possible values for this predictor: 3.5 and 7 meters.
 
-```{r predictor-histograms, fig.width=12, fig.height=5.04, fig.align='center', echo=FALSE}
+```{r predictor-histograms, fig.width=10.5, fig.height=4.2, fig.align='center', echo=FALSE}
 plot_histogram(df[, c(1:8)], nrow = 2, ncol = 4) # histograms of predictors
 ```
 
@@ -238,7 +238,7 @@ The response histograms show the following distribution found in the data:
 
 By design, there is more continuity in the distributions of both response variables. There appears to be a slight imbalance in both variables, though this could partially be attributed to the size of the histogram bins.
 
-```{r response-histograms, fig.width=12, fig.height=6.24, fig.align='center', echo=FALSE}
+```{r response-histograms, fig.width=10.5, fig.height=5, fig.align='center', echo=FALSE}
 plot_histogram(df[, c(-1:-8)], nrow = 1, ncol = 2) # histograms of response variables
 ```
 
@@ -440,9 +440,7 @@ To compare the MLR models to the original work, we use MAE, MSE, and MRE, define
 
 * $MRE = \dfrac{100}{S} \Sigma_{i \epsilon Q} \dfrac{|y_i - \hat{y}_i|}{y_i}$,
 
-where $\hat{y}_i$ is the predicted output variable, $y_i$ is the actual output variable for the $i^{th}$ entry in the test fold, $S$ is the number of samples in the test fold, and $Q$ contains the indices of the test fold. Each repetition results in 10 independent error measurements. 
-
-We end up with 1000 independent error measurements given $K = 10$ and 100 repetitions. The reported MAE, MSE, and MRE values are the average values of all the measurements, plus or minus one standard deviation. The reported errors for the IRLS and RF models come directly from the original work [@tsanas2012accurate].
+where $\hat{y}_i$ is the predicted output variable, $y_i$ is the actual output variable for the $i^{th}$ entry in the test fold, $S$ is the number of samples in the test fold, and $Q$ contains the indices of the test fold. We end up with 1000 independent error measurements. The reported metrics are the average values, plus or minus one standard deviation. 
 
 ```{r k-fold-testing, echo=FALSE, warning=FALSE, message=FALSE}
 # Define the number of repetitions and folds
@@ -716,15 +714,13 @@ tt(cool_df) %>%
 ```
 
 ### Importance of Variables
-The table shows the importance of each predictor for a given response variable determined via RF. For the MLR model, the "importance" is the magnitude of the standardized coefficients. For a better understanding of how RF determines variable importance, we recommend reviewing the literature [@strobl2007bias]. 
-
-For both models, a larger magnitude for a given predictor indicates a larger impact on the response variable. The values for each model are not on the same scale. The ranking of variable importance is denoted in the parenthesis next to each variables importance value, where 1 is the most important.
+The table shows the importance of each predictor for a given response variable determined via RF. For the MLR model, the "importance" is the magnitude of the standardized coefficients. For a better understanding of how RF determines variable importance, we recommend reviewing the literature [@strobl2007bias]. The ranking of variable importance is denoted in the parenthesis next to each variables importance value, where 1 is the most important.
 
 The heating and cooling load RF models have similar orders of importance, but the cooling load model found glazing area distribution and orientation to be more important than its heating load counterpart. The heating and cooling load MLR models have the same order of importance for the predictors they have in common.
 
-The heating load model has glazing area distribution area as an additional predictor, but it has the smallest magnitude of all the standardized coefficients. Interestingly, the RF model found that roof area and orientation were two of the least important predictors in both models, both of which were removed as predictors from the MLR models. 
+The MLR heating load model has glazing area distribution area as an additional predictor. Interestingly, the RF model found that roof area and orientation were two of the least important predictors in both models, both of which were removed as predictors from the MLR models. 
 
-The MLR cooling load model also removed glazing area distribution as a predictor, which the RF cooling load model found to have moderate relative importance. However, both RF models found glazing area to be the most important predictor, while both MLR models found it to be one of the least important variables used. 
+The MLR cooling load model removed glazing area distribution as a predictor, which the RF cooling load model found to have moderate relative importance. However, both RF models found glazing area to be the most important predictor, while both MLR models found it to be one of the least important variables used. 
 
 The MLR models also significantly overvalued overall height as a predictor in both models. Both RF models found it to be the least important variable. These results point to the same conclusion from the original work: classical regression analysis is not capable of capturing the complex, non-linear relationships in this dataset.
 
@@ -840,19 +836,22 @@ tt(importance_df) %>%
 Summary
 ===
 
-Column {data-width=650}
+Column {data-width=300}
 ---
 
-### Final Model Interpretations {data-height=300}
+### Final Model Interpretations
 Given the final MLR heating and cooling load estimated standardized coefficients, the estimated models can be written as follows:
 
-* $\hat{Heat \space Load} = 6.85(\textit{relative compactness}) + 7.69(\textit{surface area}) + 2.65(\textit{wall area}) + 7.30(\textit{overall height}) + 2.66(\textit{glazing area}) + 0.32(\textit{glazing area distribution})$
+* $\hat{Heat \space Load} = 6.85(\textit{relative compactness}) + 7.69(\textit{surface area}) + \newline 2.65(\textit{wall area}) + 7.30(\textit{overall height}) + \newline 2.66(\textit{glazing area}) + 0.32(\textit{glazing area distribution})$
 
-* $\hat{Cool \space Load} = 7.49(\textit{relative compactness}) + 7.78(\textit{surface area}) + 1.95(\textit{wall area}) + 7.50(\textit{overall height}) + 1.97(\textit{glazing area})$
+* $\hat{Cool \space Load} = 7.49(\textit{relative compactness}) + 7.78(\textit{surface area}) + \newline 1.95(\textit{wall area}) + 7.50(\textit{overall height}) + \newline 1.97(\textit{glazing area})$
 
 Since only the predictors were standardized, interpretation is as follows, within model context. Relative compactness from the heating load model is used here as an example: for every one-standard-deviation change in relative compactness, the expected change in heat load is 6.85 units, holding all other variables constant.
 
-### Conclusion {data-height=700}
+Column {data-width=350}
+---
+
+### Conclusion
 In this project, we perform 10-fold CV of a publicly available dataset from simulated EPB data. Previous work [@tsanas2012accurate] explored the use of IRLS and RF to model heating and cooling loads given 8 predictors, claiming that classical regression analysis was insufficient for capturing the complex nature of the relationships between variables. This work explored that claim by going through a model selection process that removed insignificant predictors from the heating and cooling load models when using the full dataset. 10-fold CV testing was conducted 100 times to replicate the experiment in the original work, providing MAE, MSE, and MRE metrics for direct comparison to the published IRLS and RF results. 
 
 We found that while RF was superior to the MLR models in this work, proper variable selection for the MLR models actually resulted in better performance than the IRLS models. Since IRLS is designed specifically for optimizing regression model coefficients and to handle outliers, this is a significant result. It shows that while RF is still superior for better capturing highly non-linear relationships, finely selecting the best predictors for classical regression analysis is better than simply using all variables and using IRLS in an attempt to optimize the model.
@@ -869,14 +868,14 @@ It is important to note that all of the results from this project, and the publi
 
 However, the dataset is sufficient for comparing estimated models using different methods. This is important when it comes to real-world data, as the results from this work, the published work, and any prior work, guide intuitions and decisions made when it comes to real-world analysis.
 
-Column {data-width=350}
+Column {data-width=250}
 ---
 
-### Author Information
+### Author Information {data-height=45}
 Eric Smith is a PhD student in the department of Electrical and Computer Engineering at the University of Dayton. He holds a B.S. in Physics from the Ohio State University and M.S. in Electro-Optics from the University of Dayton. He works full-time for a small defense contractor in Beavercreek, Ohio, specializing in directed energy and atmospheric simulation, modeling, and measurement. His research interests broadly include computer vision problems involving object detection and tracking, with his most recent work focused on a modular algorithm for small drone detection and tracking.
 
-### References
+### References {data-height=40}
 <div id="refs"></div>
 
-### Disclaimers
+### Disclaimers {data-height=15}
 ChatGPT, Google AI Overview, and Google Gemini were used to help with general code problems, like syntax, as well as determining necessary libraries and how to use their functions in R. Google Gemini was used to generate the IRLS flowchart and RF illustration in Figures [2](#IRLS-Flowchart) and [3](#RF-illustration), respectively.
