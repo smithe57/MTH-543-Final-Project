@@ -44,7 +44,7 @@ Project Overview
 Column {data-width=300}
 ---
 
-### Goal {data-height=28}
+### Abstract {data-height=28}
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
 rm(list = ls()) # clears global workspace to start fresh
 library(pacman)
@@ -56,8 +56,9 @@ script_path <- rstudioapi::getActiveDocumentContext()$path
 script_dir <- dirname(script_path)
 setwd(script_dir)
 # setwd("E:/School/PhD/Classes/MTH543/FinalProject/MTH-543-Final-Project")
+# setwd("F:/School/PhD/Classes/MTH543/FinalProject/MTH-543-Final-Project")
 ```
-In this final project, we perform regression analysis using building specifications to estimate energy performance of buildings (EPB), specifically heat load and cool load. The dataset used in this work is a publicaly available simulated dataset found in the UC Irvine Machine Learning Repository ([dataset link](https://archive.ics.uci.edu/dataset/242/energy+efficiency)).
+In this final project, we perform regression analysis using building specifications to estimate energy performance of buildings (EPB), specifically heating and cooling load. The dataset used in this work is a publicaly available simulated dataset found in the UC Irvine Machine Learning Repository ([dataset link](https://archive.ics.uci.edu/dataset/242/energy+efficiency)).
 
 ### Dataset Overview {data-height=28}
 In total, there are 768 observations (buildings). There are 8 predictor variables and 2 response variables. Figure [1](#intro-plot) shows a basic summary of the full dataset. From this plot, we find that the entire dataset is clean with no missing data. This is a simulated dataset that was created to investigate the effect of eight input variables on determining two output variables. The "Dataset Variables" table shows the variable names and number of possible values.
@@ -427,7 +428,7 @@ After model selection, the K-fold cross-validation (CV) experiment is conducted.
 
 * Repetitions = 100
 
-This means that the dataset is split into $K = 10$ equally (or nearly equally) sized "folds." For training the model, 9 of the 10 folds are used, while 1 fold is set aside for testing. This is done to test model generalization. Each fold is used once for testing, meaning the model is trained 10 separate times on different combinations of folds. This is one "repetition" of the process. 
+This means that the dataset is split into $K = 10$ equally (or nearly equally) sized "folds." For training the model, 9 of the 10 folds are used, while 1 fold is set aside for testing. Each fold is used once for testing, meaning the model is trained 10 separate times on different combinations of folds. This is one "repetition" of the process. 
 
 We perform 100 repetitions using 10-fold CV. The dataset is randomly shuffled at the beginning of each repetition so that unique folds are created for each repetition. After testing every test fold, the MAE, MSE, and MRE metrics are computed for the trained model.
 
